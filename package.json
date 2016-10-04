@@ -1,0 +1,15 @@
+{
+  "name": "smartpark",
+  "version": "0.0.0",
+  "description": "CSC 383 group project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Seth Immel",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.14.0",
+    "mysql": "^2.11.1"
+  }
+}
