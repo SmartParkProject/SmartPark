@@ -1,12 +1,13 @@
 var express = require("express");
 
-var config = require("./config");
+var config = require("./config"),
+    error = require("./error");
 
 module.exports = function Parking(database){
   var router = express.Router();
   var parkingState = new Array(config.range_parking_spots);
 
-  //Consider moving parking state to own module
+  //TODO(Seth): Consider moving parking state to own module
   var buildParkingState = function(){
     database.query("SELECT * FROM transactions",function(err, results){
       if(err) throw err;
@@ -16,21 +17,15 @@ module.exports = function Parking(database){
     });
   };
 
-  //TODO(Seth): Create proper error module.
-  var handleAPIError = function(res, status, message){
-    res.status(status);
-    res.send(JSON.stringify({status:status, message:message}));
-  };
-
   buildParkingState();
 
   //Routes
-  router.get("/", function(req, res) {
+  router.get("/", function(req, res, next) {
     //Query db and build parking state
     res.send(JSON.stringify(parkingState)); //send object containing parking state (JSON.stringify)
   });
 
-  router.post("/", function(req, res) {
+  router.post("/", function(req, res, next) {
     //Expected data:
     //userid
     //reserve_length
@@ -38,13 +33,13 @@ module.exports = function Parking(database){
     //TODO(Seth): Full validation of json object
     data = req.body;
     if(data.spot > config.range_parking_spots)
-      return handleAPIError(res, 400, "Parking spot id exceeds maximum range for value.");
+      return next(new error.BadRequest("Parking spot id exceeds maximum range for value."));
 
     if(parkingState[data.spot])
-      return handleAPIError(res, 409, "Transaction already exists for parking spot with id: " + data.spot);
+      return next(new error.Conflict("Transaction already exists for parking spot with id: " + data.spot));
 
     if(parkingState.find(a => a != null && a.userid == data.userid))
-      return handleAPIError(res, 409, "Transaction already exists for user: " + data.userid);
+      return next(new error.Conflict("Transaction already exists for user: " + data.userid));
 
     //We use a transaction here to guarantee the integrity of the state object.
     database.beginTransaction(function(err){
@@ -64,11 +59,11 @@ module.exports = function Parking(database){
     });
   });
 
-  router.get("/:id", function(req, res) {
+  router.get("/:id", function(req, res, next) {
     if(parkingState[req.params.id]){
       res.send(JSON.stringify(parkingState[req.params.id]));
     }else{
-      handleAPIError(res, 404, "No transactional information for parking spot with id: " + req.params.id);
+      next(new error.NotFound("No transactional information for parking spot with id: " + req.params.id));
     }
   });
 

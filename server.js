@@ -4,7 +4,8 @@ var mysql = require("mysql"),
     bodyParser = require("body-parser");
 //local modules
 var config = require("./config"),
-    Parking = require("./Parking");
+    Parking = require("./Parking"),
+    error = require("./error");
 
 var app = express();
 
@@ -23,6 +24,9 @@ app.use(bodyParser.json());
 var parking = new Parking(database);
 
 app.use("/parking",parking);
+
+//Error handling
+app.use(error.handler);
 
 app.listen(3000, function(){
   console.log("Listening on port 3000");
