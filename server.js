@@ -15,11 +15,25 @@ var connection = mysql.createConnection({
 });
 connection.connect();
 
+var parkingState = new Array(config.range_parking_spots);
+
+var buildParkingState = function(){
+  connection.query("SELECT * FROM transactions",function(err, results){
+    if(err) throw err;
+    results.map(function(current, index){
+      parkingState[current.spot] = current;
+    });
+  });
+};
+
 var handleAPIError = function(res, status, message){
   //TODO(Seth): Come up with a better way of handling API errors.
   res.status(status);
   res.send(JSON.stringify({status:status, message:message}));
 };
+
+//Initialization
+buildParkingState();
 
 //Middleware
 app.use(bodyParser.json());
@@ -37,7 +51,7 @@ app.get("/",function(req, res){
 
 app.get("/parking", function(req, res) {
   //Query db and build parking state
-  res.send(); //send object containing parking state (JSON.stringify)
+  res.send(JSON.stringify(parkingState)); //send object containing parking state (JSON.stringify)
 });
 
 app.post("/parking", function(req, res) {
@@ -46,40 +60,31 @@ app.post("/parking", function(req, res) {
   //duration
   //spot
   data = req.body;
-  //TODO(Seth): rely on state object instead of making queries for integrity checks.
-  connection.query("SELECT 1 FROM transactions WHERE spot = ?", data.spot, function(err, results){
+  if(data.spot>config.range_parking_spots)
+    return handleAPIError(res, 400, "Parking spot id exceeds maximum range for value.");
+
+  if(parkingState[data.spot])
+    return handleAPIError(res, 409, "Transaction already exists for parking spot with id: " + data.spot);
+
+  if(parkingState.find(a => a!=null && a.userid == data.userid))
+    return handleAPIError(res, 409, "Transaction already exists for user: " + data.userid);
+  //TODO(Seth): handle invalid userid length
+
+  //Date objects are automatically formatted (Nice.)
+  connection.query("INSERT INTO transactions (userid, spot, reserve_time, reserve_length) VALUES(?, ?, ?, ?);", [data.userid, data.spot, new Date(), data.duration], function(err, results){
     if(err) throw err;
-    if(results.length!=0){
-      handleAPIError(res, 409, "Transaction already exists for parking spot with id: " + data.spot);
-      return;
-    }
-    connection.query("SELECT 1 FROM transactions WHERE userid = ?", data.userid, function(err, results){
-      if(err) throw err;
-      if(results.length!=0){
-        handleAPIError(res, 409, "Transaction already exists for user: " + data.userid);
-        return;
-      }
-      //Date objects are automatically formatted (Nice.)
-      connection.query("INSERT INTO transactions (userid, spot, reserve_time, reserve_length) VALUES(?, ?, ?, ?);", [data.user, data.spot, new Date(), data.duration], function(err, results){
-        if(err) throw err;
-        res.status(201);
-        res.send(JSON.stringify({status:"201", transaction_id:results.insertId}));
-      });
-    });
+    parkingState[data.spot] = data;
+    res.status(201);
+    res.send(JSON.stringify({status:"201", transaction_id:results.insertId}));
   });
 });
 
 app.get("/parking/:id", function(req, res) {
-  connection.query("SELECT * FROM transactions WHERE spot = ?", req.params.id, function(err,results){
-    if(err) throw err;
-    if(results.length==0){
-      handleAPIError(res, 404, "No transactional information for parking spot with id: " + req.params.id);
-    }else if(results.length>1){
-      throw new Error("Multiple transactions with identical parking spot.");
-    }else{
-      res.send(JSON.stringify(results[0]));
-    }
-  });
+  if(parkingState[req.params.id]){
+    res.send(JSON.stringify(parkingState[req.params.id]));
+  }else{
+    handleAPIError(res, 404, "No transactional information for parking spot with id: " + req.params.id);
+  }
 });
 
 app.listen(3000, function(){
