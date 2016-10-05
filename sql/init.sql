@@ -1,7 +1,8 @@
 -- CREATE TABLE IF NOT EXISTS customers (id INT PRIMARY KEY, name VARCHAR(20));
 CREATE TABLE IF NOT EXISTS transactions (
-    id CHAR(15) PRIMARY KEY,
-    spot INT NOT NULL,
-    reserve_time DATETIME NOT NULL,
-    reserve_length INT NOT NULL
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  userid CHAR(15) NOT NULL,
+  spot INT NOT NULL,
+  reserve_time DATETIME NOT NULL,
+  reserve_length INT NOT NULL
 );
