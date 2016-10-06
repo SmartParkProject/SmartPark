@@ -1,7 +1,8 @@
 //3rd party modules
 var mysql = require("mysql"),
     express = require("express"),
-    bodyParser = require("body-parser");
+    bodyParser = require("body-parser"),
+    winston = require("winston");
 //local modules
 var config = require("./config"),
     Parking = require("./Parking"),
@@ -9,13 +10,29 @@ var config = require("./config"),
 
 var app = express();
 
+var logger = new (winston.Logger)({
+  transports: [
+    new (winston.transports.File)({
+      filename:"log/critical.log",
+      level:"info"
+    }),
+    new (winston.transports.Console)({level:"debug"})
+  ]
+});
+
 var database = mysql.createConnection({
   host : 'localhost',
   user : config.db_username,
   password : config.db_password,
   database : 'smartpark'
 });
-database.connect();
+database.connect(function(err){
+  if(err){
+    logger.log("error", err); //This doesn't get logged. May need to look into using winston.handleExceptions
+    throw err;
+  }
+  logger.log("debug", "Connected to database as id " + database.threadId);
+});
 
 //Middleware
 app.use(bodyParser.json());
@@ -23,11 +40,11 @@ app.use(bodyParser.json());
 //Routes
 var parking = new Parking(database);
 
-app.use("/parking",parking);
+app.use("/parking", parking);
 
-//Error handling
-app.use(error.handler);
+//Error handling TODO(Seth): add file transport for release
+app.use(new error.Handler(logger));
 
 app.listen(3000, function(){
-  console.log("Listening on port 3000");
+  logger.log("debug", "Listening on port 3000");
 });

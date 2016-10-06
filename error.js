@@ -2,12 +2,16 @@ var exports = module.exports;
 
 const ERROR_API = 1;
 
-exports.handler = function(err, req, res, next){
-  if(err.type==ERROR_API){
-    res.status(err.statusCode);
-    res.send(JSON.stringify({status:err.statusCode, message:err.message}));
-  }else{
-    next(err);
+exports.Handler = function(logger){
+  return function(err, req, res, next){
+    if(err.type === ERROR_API){
+      logger.log("warn", req.ip, err);
+      res.status(err.statusCode);
+      res.send(JSON.stringify({status:err.statusCode, message:err.message}));
+    }else{
+      logger.log("error", err);
+      next(err);
+    }
   }
 }
 

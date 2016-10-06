@@ -21,15 +21,10 @@ module.exports = function Parking(database){
 
   //Routes
   router.get("/", function(req, res, next) {
-    //Query db and build parking state
-    res.send(JSON.stringify(parkingState)); //send object containing parking state (JSON.stringify)
+    res.send(JSON.stringify(parkingState));
   });
 
   router.post("/", function(req, res, next) {
-    //Expected data:
-    //userid
-    //reserve_length
-    //spot
     //TODO(Seth): Full validation of json object
     data = req.body;
     if(data.spot > config.range_parking_spots)
