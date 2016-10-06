@@ -1,7 +1,7 @@
 var express = require("express");
 
-var config = require("./config"),
-    error = require("./error");
+var config = require("../config"),
+    error = require("../utilities/error");
 
 module.exports = function Parking(database){
   var router = express.Router();

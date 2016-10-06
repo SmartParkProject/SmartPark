@@ -15,7 +15,7 @@ exports.Handler = function(logger){
   }
 }
 
-ErrorFactory = function(){
+var ErrorFactory = function(){
   this.getAPIError = function(statusCode, default_message){
     return function(message, errorCode){
       this.message = message || default_message;

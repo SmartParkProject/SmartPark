@@ -5,8 +5,8 @@ var mysql = require("mysql"),
     winston = require("winston");
 //local modules
 var config = require("./config"),
-    Parking = require("./Parking"),
-    error = require("./error");
+    Parking = require("./controllers/Parking"),
+    error = require("./utilities/error");
 
 var app = express();
 
@@ -42,7 +42,7 @@ var parking = new Parking(database);
 
 app.use("/parking", parking);
 
-//Error handling TODO(Seth): add file transport for release
+//Error handling
 app.use(new error.Handler(logger));
 
 app.listen(3000, function(){
