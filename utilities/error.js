@@ -7,7 +7,7 @@ exports.Handler = function(logger){
     if(err.type === ERROR_API){
       logger.log("warn", req.ip, err);
       res.status(err.statusCode);
-      res.send(JSON.stringify({status:err.statusCode, message:err.message}));
+      res.json({status:err.statusCode, message:err.message});
     }else{
       logger.log("error", err);
       next(err);

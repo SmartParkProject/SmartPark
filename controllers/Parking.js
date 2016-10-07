@@ -21,7 +21,7 @@ module.exports = function Parking(database){
 
   //Routes
   router.get("/", function(req, res, next) {
-    res.send(JSON.stringify(parkingState));
+    res.json(parkingState);
   });
 
   router.post("/", function(req, res, next) {
@@ -47,7 +47,7 @@ module.exports = function Parking(database){
             if (err) return database.rollback(function() { throw err; });
             parkingState[data.spot] = results[0];
             res.status(201);
-            res.send(JSON.stringify({status:"201", transaction_id:results[0].id}));
+            res.json({status:"201", transaction_id:results[0].id});
           });
         });
       });
@@ -57,16 +57,16 @@ module.exports = function Parking(database){
   router.get("/available/:id", function(req, res, next) {
     //TODO(Seth): validate id
     if(parkingState[req.params.id]){
-      res.send(JSON.stringify({status:200, result:0}));
+      res.json({status:200, result:0});
     }else{
-      res.send(JSON.stringify({status:200, result:1}));
+      res.json({status:200, result:1});
     }
   });
 
   router.get("/:id", function(req, res, next) {
     //TODO(Seth): validate id and consider mapping /id to the transaction id to better conform to rest standards
     if(parkingState[req.params.id]){
-      res.send(JSON.stringify(parkingState[req.params.id]));
+      res.json(parkingState[req.params.id]);
     }else{
       next(new error.NotFound("No transactional information for parking spot with id: " + req.params.id));
     }
