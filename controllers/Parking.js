@@ -1,11 +1,39 @@
-var express = require("express");
+var express = require("express"),
+    Ajv = require("ajv");
 
 var config = require("../config"),
     error = require("../utilities/error");
 
+var ajv = new Ajv();
+var transactionSchema = {
+  "properties":{
+    "userid":{
+      "type":"string",
+      "minLength":15,
+      "maxLength":15
+    },
+    "spot":{"$ref":"/ParkingSpot"},
+    "reserve_length":{
+      "type":"integer",
+      "minimum":config.min_reserve_length,
+      "maximum":config.max_reserve_length
+    }
+  },
+  "required":["userid", "spot", "reserve_length"]
+};
+
+var parkingspotSchema = {
+  "id":"/ParkingSpot",
+  "type":"integer",
+  "minimum":0,
+  "maximum":config.max_parking_spots
+}
+
+ajv.addSchema(parkingspotSchema, "/ParkingSpot");
+
 module.exports = function Parking(database){
   var router = express.Router();
-  var parkingState = new Array(config.range_parking_spots);
+  var parkingState = new Array(config.max_parking_spots);
 
   //TODO(Seth): Consider moving parking state to own module
   var buildParkingState = function(){
@@ -25,10 +53,10 @@ module.exports = function Parking(database){
   });
 
   router.post("/", function(req, res, next) {
-    //TODO(Seth): Full validation of json object
     data = req.body;
-    if(data.spot > config.range_parking_spots)
-      return next(new error.BadRequest("Parking spot id exceeds maximum range for value."));
+    var valid = ajv.validate(transactionSchema, data);
+    if(!valid)
+      return next(new error.BadRequest("Bad parameter: " + ajv.errorsText()));
 
     if(parkingState[data.spot])
       return next(new error.Conflict("Transaction already exists for parking spot with id: " + data.spot));
@@ -55,7 +83,6 @@ module.exports = function Parking(database){
   });
 
   router.get("/available", function(req, res, next) {
-    //TODO(Seth): validate id
     //Array.map stops after encountering the last non-null value. Lame.
     var converted_array = new Array(parkingState.length);
     for(var i = 0; i < parkingState.length; i++){
@@ -64,8 +91,12 @@ module.exports = function Parking(database){
     res.json(converted_array);
   });
 
-  router.get("/available/:id", function(req, res, next) {
-    //TODO(Seth): validate id
+  router.get("/available/:id(\\d+)/", function(req, res, next) {
+    req.params.id = parseInt(req.params.id);
+    valid = ajv.validate(parkingspotSchema, req.params.id);
+    if(!valid)
+      return next(new error.BadRequest("Bad request: " + ajv.errorsText()));
+
     if(parkingState[req.params.id]){
       res.json({status:200, result:0});
     }else{
@@ -73,8 +104,13 @@ module.exports = function Parking(database){
     }
   });
 
-  router.get("/:id", function(req, res, next) {
-    //TODO(Seth): validate id and consider mapping /id to the transaction id to better conform to rest standards
+  router.get("/:id(\\d+)/", function(req, res, next) {
+    //TODO(Seth): Consider mapping /id to the transaction id to better conform to rest standards
+    req.params.id = parseInt(req.params.id);
+    valid = ajv.validate(parkingspotSchema, req.params.id);
+    if(!valid)
+      return next(new error.BadRequest("Bad request: " + ajv.errorsText()));
+
     if(parkingState[req.params.id]){
       res.json(parkingState[req.params.id]);
     }else{
