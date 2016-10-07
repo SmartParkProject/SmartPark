@@ -54,7 +54,17 @@ module.exports = function Parking(database){
     });
   });
 
+  router.get("/available/:id", function(req, res, next) {
+    //TODO(Seth): validate id
+    if(parkingState[req.params.id]){
+      res.send(JSON.stringify({status:200, result:0}));
+    }else{
+      res.send(JSON.stringify({status:200, result:1}));
+    }
+  });
+
   router.get("/:id", function(req, res, next) {
+    //TODO(Seth): validate id and consider mapping /id to the transaction id to better conform to rest standards
     if(parkingState[req.params.id]){
       res.send(JSON.stringify(parkingState[req.params.id]));
     }else{
