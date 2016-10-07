@@ -54,6 +54,16 @@ module.exports = function Parking(database){
     });
   });
 
+  router.get("/available", function(req, res, next) {
+    //TODO(Seth): validate id
+    //Array.map stops after encountering the last non-null value. Lame.
+    var converted_array = new Array(parkingState.length);
+    for(var i = 0; i < parkingState.length; i++){
+      converted_array[i] = parkingState[i] ? 0 : 1;
+    }
+    res.json(converted_array);
+  });
+
   router.get("/available/:id", function(req, res, next) {
     //TODO(Seth): validate id
     if(parkingState[req.params.id]){
