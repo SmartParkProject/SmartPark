@@ -1,5 +1,7 @@
 module.exports = {
   db_username:"username",
   db_password:"password",
-  range_parking_spots:100
+  max_parking_spots:100,
+  min_reserve_length:1,
+  max_reserve_length:24
 };

@@ -12,7 +12,7 @@ var transactionSchema = {
       "minLength":15,
       "maxLength":15
     },
-    "spot":{"$ref":"/ParkingSpot"},
+    "spot":{"$ref":"/parkingspot"},
     "reserve_length":{
       "type":"integer",
       "minimum":config.min_reserve_length,
@@ -23,13 +23,12 @@ var transactionSchema = {
 };
 
 var parkingspotSchema = {
-  "id":"/ParkingSpot",
   "type":"integer",
   "minimum":0,
   "maximum":config.max_parking_spots
 }
 
-ajv.addSchema(parkingspotSchema, "/ParkingSpot");
+ajv.addSchema(parkingspotSchema, "/parkingspot");
 
 module.exports = function Parking(database){
   var router = express.Router();
