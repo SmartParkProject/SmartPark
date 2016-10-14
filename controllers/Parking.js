@@ -82,7 +82,7 @@ module.exports = function Parking(database){
   });
 
   router.get("/available", function(req, res, next) {
-    //Array.map stops after encountering the last non-null value. Lame.
+    //Array.map skips holes. Lame
     var converted_array = new Array(parkingState.length);
     for(var i = 0; i < parkingState.length; i++){
       converted_array[i] = parkingState[i] ? 0 : 1;
