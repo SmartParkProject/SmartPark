@@ -7,11 +7,7 @@ var config = require("../config"),
 var ajv = new Ajv();
 var transactionSchema = {
   "properties":{
-    "userid":{
-      "type":"string",
-      "minLength":15,
-      "maxLength":15
-    },
+    "userid":{"$ref":"/userid"},
     "spot":{"$ref":"/parkingspot"},
     "reserve_length":{
       "type":"integer",
@@ -22,6 +18,12 @@ var transactionSchema = {
   "required":["userid", "spot", "reserve_length"]
 };
 
+var useridSchema = {
+  "type":"string",
+  "minLength":15,
+  "maxLength":15
+}
+
 var parkingspotSchema = {
   "type":"integer",
   "minimum":0,
@@ -29,6 +31,7 @@ var parkingspotSchema = {
 }
 
 ajv.addSchema(parkingspotSchema, "/parkingspot");
+ajv.addSchema(useridSchema, "/userid");
 
 module.exports = function Parking(database, logger){
   var router = express.Router();
@@ -87,7 +90,7 @@ module.exports = function Parking(database, logger){
     for(var i = 0; i < parkingState.length; i++){
       converted_array[i] = parkingState[i] ? 0 : 1;
     }
-    res.json({status:200, result:converted_array});
+    res.json({status:200, result:converted_array, count:converted_array.reduce((a, b) => a + b)});
   });
 
   router.get("/available/:id(\\d+)/", function(req, res, next) {
@@ -115,6 +118,21 @@ module.exports = function Parking(database, logger){
     }else{
       next(new error.NotFound("No transactional information for parking spot with id: " + req.params.id));
     }
+  });
+  
+  //TODO(Seth): Change this - also strip the table id from the result data
+  router.get("/user/:id/", function(req, res, next) {
+	valid = ajv.validate(useridSchema, req.params.id);
+    if(!valid)
+      return next(new error.BadRequest("Bad request: " + ajv.errorsText()));
+	
+	data = parkingState.find(a => a != null && a.userid == req.params.id);
+	if(data){
+	  res.status(201);
+      res.json({status:"201", result:data});
+	}else{
+	  next(new error.NotFound("No transactional information for user with id: " + req.params.id));
+	}
   });
 
   return router;

@@ -37,8 +37,8 @@ database.connect(function(err){
 //Middleware
 app.use(bodyParser.json());
 app.use(function(req, res, next){
-	logger.log("debug", "("+(new Date()).toLocaleString()+") " + req.ip + " - " + req.originalUrl);
-	next();
+  logger.log("debug", "("+(new Date()).toLocaleString()+") " + req.ip + " - " + req.originalUrl);
+  next();
 });
 
 //Routes
@@ -49,6 +49,8 @@ app.use("/parking", parking);
 //Error handling
 app.use(new error.Handler(logger));
 
-app.listen(3000, function(){
-  logger.log("debug", "Listening on port 3000");
+app.set('port', process.env.PORT || 80);
+
+app.listen(app.get('port'), function(){
+  logger.log("debug", "Listening on port " + app.get('port'));
 });
