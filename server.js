@@ -36,9 +36,13 @@ database.connect(function(err){
 
 //Middleware
 app.use(bodyParser.json());
+app.use(function(req, res, next){
+	logger.log("debug", "("+(new Date()).toLocaleString()+") " + req.ip + " - " + req.originalUrl);
+	next();
+});
 
 //Routes
-var parking = new Parking(database);
+var parking = new Parking(database, logger);
 
 app.use("/parking", parking);
 

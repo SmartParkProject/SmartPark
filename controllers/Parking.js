@@ -30,7 +30,7 @@ var parkingspotSchema = {
 
 ajv.addSchema(parkingspotSchema, "/parkingspot");
 
-module.exports = function Parking(database){
+module.exports = function Parking(database, logger){
   var router = express.Router();
   var parkingState = new Array(config.max_parking_spots);
 
@@ -87,7 +87,7 @@ module.exports = function Parking(database){
     for(var i = 0; i < parkingState.length; i++){
       converted_array[i] = parkingState[i] ? 0 : 1;
     }
-    res.json(converted_array);
+    res.json({status:200, result:converted_array});
   });
 
   router.get("/available/:id(\\d+)/", function(req, res, next) {
