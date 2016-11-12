@@ -39,10 +39,14 @@ module.exports = function Parking(database, logger){
 
   //TODO(Seth): Consider moving parking state to own module
   var buildParkingState = function(){
-    database.query("SELECT * FROM transactions",function(err, results){
+    database.getConnection(function(err,connection){
       if(err) throw err;
-      results.map(function(current, index){
-        parkingState[current.spot] = current;
+      connection.query("SELECT * FROM transactions",function(err, results){
+        connection.release();
+        if(err) throw err;
+        results.map(function(current, index){
+          parkingState[current.spot] = current;
+        });
       });
     });
   };
@@ -67,17 +71,21 @@ module.exports = function Parking(database, logger){
       return next(new error.Conflict("Transaction already exists for user: " + data.userid));
 
     //We use a transaction here to guarantee the integrity of the state object.
-    database.beginTransaction(function(err){
+    database.getConnection(function(err, connection){
       if(err) throw err;
-      database.query("INSERT INTO transactions (userid, spot, reserve_time, reserve_length) VALUES(?, ?, ?, ?)", [data.userid, data.spot, new Date(), data.reserve_length], function(err, results){
-        if (err) return database.rollback(function() { throw err; });
-        database.query("SELECT * FROM transactions WHERE id = ?", results.insertId, function(err,results){
-          if (err) return database.rollback(function() { throw err; });
-          database.commit(function(err){
-            if (err) return database.rollback(function() { throw err; });
-            parkingState[data.spot] = results[0];
-            res.status(201);
-            res.json({status:"201", transaction_id:results[0].id});
+      connection.beginTransaction(function(err){
+        if(err) throw err;
+        connection.query("INSERT INTO transactions (userid, spot, reserve_time, reserve_length) VALUES(?, ?, ?, ?)", [data.userid, data.spot, new Date(), data.reserve_length], function(err, results){
+          if (err) return connection.rollback(function() { throw err; });
+          connection.query("SELECT * FROM transactions WHERE id = ?", results.insertId, function(err,results){
+            if (err) return connection.rollback(function() { throw err; });
+            connection.commit(function(err){
+              if (err) return connection.rollback(function() { throw err; });
+              connection.release();
+              parkingState[data.spot] = results[0];
+              res.status(201);
+              res.json({status:"201", transaction_id:results[0].id});
+            });
           });
         });
       });
@@ -119,13 +127,13 @@ module.exports = function Parking(database, logger){
       next(new error.NotFound("No transactional information for parking spot with id: " + req.params.id));
     }
   });
-  
+
   //TODO(Seth): Change this - also strip the table id from the result data
   router.get("/user/:id/", function(req, res, next) {
 	valid = ajv.validate(useridSchema, req.params.id);
     if(!valid)
       return next(new error.BadRequest("Bad request: " + ajv.errorsText()));
-	
+
 	data = parkingState.find(a => a != null && a.userid == req.params.id);
 	if(data){
 	  res.status(201);

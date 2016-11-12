@@ -20,19 +20,8 @@ var logger = new (winston.Logger)({
   ]
 });
 
-var database = mysql.createConnection({
-  host : 'localhost',
-  user : config.db_username,
-  password : config.db_password,
-  database : 'smartpark'
-});
-database.connect(function(err){
-  if(err){
-    logger.log("error", err); //This doesn't get logged. May need to look into using winston.handleExceptions
-    throw err;
-  }
-  logger.log("debug", "Connected to database as id " + database.threadId);
-});
+//Create connection pool for database.
+var database = mysql.createPool(config.db);
 
 //Middleware
 app.use(bodyParser.json());
@@ -50,7 +39,6 @@ app.use("/parking", parking);
 app.use(new error.Handler(logger));
 
 app.set('port', process.env.PORT || 80);
-
 app.listen(app.get('port'), function(){
   logger.log("debug", "Listening on port " + app.get('port'));
 });
