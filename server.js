@@ -27,7 +27,7 @@ var database = mysql.createPool(config.db);
 //Middleware
 app.use(bodyParser.json());
 app.use(function(req, res, next){
-  logger.log("debug", "("+(new Date()).toLocaleString()+") " + req.ip + " - " + req.method + ": " + req.originalUrl);
+  logger.log("debug", "("+(new Date()).toLocaleString()+") " + req.ip + " - " + req.method + " " + req.originalUrl);
   next();
 });
 

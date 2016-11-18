@@ -42,7 +42,7 @@ module.exports = function Parking(database, logger){
     parkingState = new Array(config.max_parking_spots);
     database.getConnection(function(err,connection){
       if(err) throw err;
-      connection.query("SELECT * FROM transactions", function(err, results){
+      connection.query("SELECT userid, spot, reserve_time, reserve_length FROM transactions", function(err, results){
         connection.release();
         if(err) throw err;
         results.map(function(current, index){
@@ -79,14 +79,14 @@ module.exports = function Parking(database, logger){
         if(err) throw err;
         connection.query("INSERT INTO transactions (userid, spot, reserve_time, reserve_length) VALUES(?, ?, ?, ?)", [data.userid, data.spot, new Date(), data.reserve_length], function(err, results){
           if (err) return connection.rollback(function() { throw err; });
-          connection.query("SELECT * FROM transactions WHERE id = ?", results.insertId, function(err,results){
+          connection.query("SELECT userid, spot, reserve_time, reserve_length FROM transactions WHERE id = ?", results.insertId, function(err,results){
             if (err) return connection.rollback(function() { throw err; });
             connection.commit(function(err){
               if (err) return connection.rollback(function() { throw err; });
               connection.release();
               parkingState[data.spot] = results[0];
               res.status(201);
-              res.json({status:"201", transaction_id:results[0].id});
+              res.json({status:"201", data:results[0]});
             });
           });
         });
@@ -151,7 +151,6 @@ module.exports = function Parking(database, logger){
       return next(new error.BadRequest("Bad request: " + ajv.errorsText()));
 
   	var index = parkingState.findIndex(a => a != null && a.userid == req.params.id);
-    console.log("found user at index:" + index);
   	if(index != -1){
       database.getConnection(function(err,connection){
         if(err) throw err;
