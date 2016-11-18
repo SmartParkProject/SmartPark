@@ -6,6 +6,7 @@ var mysql = require("mysql"),
 //local modules
 var config = require("./config"),
     Parking = require("./controllers/Parking"),
+    Debug = require("./controllers/Debug"),
     error = require("./utilities/error");
 
 var app = express();
@@ -26,7 +27,7 @@ var database = mysql.createPool(config.db);
 //Middleware
 app.use(bodyParser.json());
 app.use(function(req, res, next){
-  logger.log("debug", "("+(new Date()).toLocaleString()+") " + req.ip + " - " + req.originalUrl);
+  logger.log("debug", "("+(new Date()).toLocaleString()+") " + req.ip + " - " + req.method + ": " + req.originalUrl);
   next();
 });
 
@@ -34,6 +35,12 @@ app.use(function(req, res, next){
 var parking = new Parking(database, logger);
 
 app.use("/parking", parking);
+
+if(process.env.NODE_ENV !== 'production'){
+  logger.log("warn","!!!DEBUG FEATURES ACTIVE");
+  var debug = new Debug(database, logger, parking);
+  app.use("/debug", debug);
+}
 
 //Error handling
 app.use(new error.Handler(logger));

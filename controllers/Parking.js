@@ -35,23 +35,25 @@ ajv.addSchema(useridSchema, "/userid");
 
 module.exports = function Parking(database, logger){
   var router = express.Router();
-  var parkingState = new Array(config.max_parking_spots);
+  var parkingState;
 
   //TODO(Seth): Consider moving parking state to own module
   var buildParkingState = function(){
+    parkingState = new Array(config.max_parking_spots);
     database.getConnection(function(err,connection){
       if(err) throw err;
-      connection.query("SELECT * FROM transactions",function(err, results){
+      connection.query("SELECT * FROM transactions", function(err, results){
         connection.release();
         if(err) throw err;
         results.map(function(current, index){
           parkingState[current.spot] = current;
         });
+        logger.log("debug","Built parking state.");
       });
     });
   };
-
   buildParkingState();
+  if(process.env.NODE_ENV !== 'production') router.buildParkingState = buildParkingState;
 
   //Routes
   router.get("/", function(req, res, next) {
@@ -103,7 +105,7 @@ module.exports = function Parking(database, logger){
 
   router.get("/available/:id(\\d+)/", function(req, res, next) {
     req.params.id = parseInt(req.params.id);
-    valid = ajv.validate(parkingspotSchema, req.params.id);
+    var valid = ajv.validate(parkingspotSchema, req.params.id);
     if(!valid)
       return next(new error.BadRequest("Bad request: " + ajv.errorsText()));
 
@@ -117,7 +119,7 @@ module.exports = function Parking(database, logger){
   router.get("/:id(\\d+)/", function(req, res, next) {
     //TODO(Seth): Consider mapping /id to the transaction id to better conform to rest standards
     req.params.id = parseInt(req.params.id);
-    valid = ajv.validate(parkingspotSchema, req.params.id);
+    var valid = ajv.validate(parkingspotSchema, req.params.id);
     if(!valid)
       return next(new error.BadRequest("Bad request: " + ajv.errorsText()));
 
@@ -130,17 +132,40 @@ module.exports = function Parking(database, logger){
 
   //TODO(Seth): Change this - also strip the table id from the result data
   router.get("/user/:id/", function(req, res, next) {
-	valid = ajv.validate(useridSchema, req.params.id);
+  	var valid = ajv.validate(useridSchema, req.params.id);
     if(!valid)
       return next(new error.BadRequest("Bad request: " + ajv.errorsText()));
 
-	data = parkingState.find(a => a != null && a.userid == req.params.id);
-	if(data){
-	  res.status(201);
-      res.json({status:"201", result:data});
-	}else{
-	  next(new error.NotFound("No transactional information for user with id: " + req.params.id));
-	}
+  	var data = parkingState.find(a => a != null && a.userid == req.params.id);
+  	if(data){
+  	  res.status(200);
+      res.json({status:"200", result:data});
+  	}else{
+  	  next(new error.NotFound("No transactional information for user with id: " + req.params.id));
+  	}
+  });
+
+  router.delete("/user/:id/", function(req, res, next) {
+  	valid = ajv.validate(useridSchema, req.params.id);
+    if(!valid)
+      return next(new error.BadRequest("Bad request: " + ajv.errorsText()));
+
+  	var index = parkingState.findIndex(a => a != null && a.userid == req.params.id);
+    console.log("found user at index:" + index);
+  	if(index != -1){
+      database.getConnection(function(err,connection){
+        if(err) throw err;
+        connection.query("DELETE FROM transactions WHERE userid = ?", [req.params.id], function(err, results){
+          connection.release();
+          if(err) throw err;
+          delete parkingState[index];
+          res.status(200);
+          res.json({status:"200", result:"Successfully removed transaction for user: " + req.params.id});
+        });
+      });
+  	}else{
+  	  next(new error.NotFound("No transactions for user with id: " + req.params.id));
+  	}
   });
 
   return router;
