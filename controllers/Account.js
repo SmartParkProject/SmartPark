@@ -74,7 +74,7 @@ module.exports = function Account(database, logger){
             connection.release();
             if(err) throw err;
             res.status(201);
-            res.json({status:201, result:"Successfully created account."}); //Probably just going to redirect to login page on success
+            res.json({status:201, result:"Successfully created account."});
           });
         }else{
           return next(new error.BadRequest("Account already exists with username: " + data.username));
@@ -88,11 +88,11 @@ module.exports = function Account(database, logger){
     if(!data.token)
       return next(new error.BadRequest("No token provided."));
 
-    jwt.verify(data.token, config.secret, function(err, decoded){
-      if(err){
-        return next(new error.BadRequest("Token error: " + err.message));
-      }
-    });
+    try{
+      jwt.verify(data.token, config.secret);
+    }catch(e){
+      return next(new error.BadRequest("Token error: " + e.message));
+    }
     res.status(200);
     res.json({status:200, result:"Token is valid."});
   });

@@ -17,6 +17,7 @@ module.exports = function Debug(database, logger, parking){
   });
 
   router.get("/fill", function(req, res, next) {
+    return; //Currently non-functional
     database.getConnection(function(err,connection){
       //In theory, these variables are local to the callback for getconnection
       //and should not be modified by subsequent calls to /fill.

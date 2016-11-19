@@ -39,8 +39,7 @@ ajv.addSchema(useridSchema, "/userid");
 module.exports = function Parking(database, logger){
   var router = express.Router();
 
-  //Routes
-  router.post("/", function(req, res, next) {
+  router.post("/", function(req, res, next){
     var data = req.body;
     var valid = ajv.validate(transactionSchema, data);
     if(!valid)
@@ -48,14 +47,12 @@ module.exports = function Parking(database, logger){
 
     //Verify token and get user id.
     var token_data;
-    jwt.verify(data.token, config.secret, function(err, decoded){
-      if(err){
-        return next(new error.BadRequest("Token error: " + err.message));
-      }
-      token_data = decoded;
-    });
+    try{
+      token_data = jwt.verify(data.token, config.secret);
+    }catch(e){
+      return next(new error.BadRequest("Token error: " + e.message));
+    }
 
-    //We use a transaction here to guarantee the integrity of the state object.
     database.getConnection(function(err, connection){
       if(err) throw err;
       connection.query("SELECT * FROM transactions", function(err, results){
@@ -76,8 +73,7 @@ module.exports = function Parking(database, logger){
     });
   });
 
-  router.get("/available", function(req, res, next) {
-    //Array.map skips holes. Lame
+  router.get("/available", function(req, res, next){
     var converted_array = new Array(config.max_parking_spots);
     for(var i = 0; i < config.max_parking_spots; i++){
       converted_array[i] = 1;
@@ -95,7 +91,7 @@ module.exports = function Parking(database, logger){
     });
   });
 
-  router.get("/available/:id(\\d+)/", function(req, res, next) {
+  router.get("/available/:id(\\d+)/", function(req, res, next){
     req.params.id = parseInt(req.params.id);
     var valid = ajv.validate(parkingspotSchema, req.params.id);
     if(!valid)
@@ -115,7 +111,7 @@ module.exports = function Parking(database, logger){
     });
   });
 
-  router.get("/spot/:id(\\d+)/", function(req, res, next) {
+  router.get("/spot/:id(\\d+)/", function(req, res, next){
     req.params.id = parseInt(req.params.id);
     var valid = ajv.validate(parkingspotSchema, req.params.id);
     if(!valid)
@@ -136,20 +132,17 @@ module.exports = function Parking(database, logger){
     });
   });
 
-  //TODO(Seth): Change this - also strip the table id from the result data
-  //Modify and require token
-  router.post("/status", function(req, res, next) {
+  router.post("/status", function(req, res, next){
     var data = req.body;
     if(!data.token)
       return next(new error.BadRequest("No token provided."));
 
     var token_data;
-    jwt.verify(data.token, config.secret, function(err, decoded){
-      if(err){
-        return next(new error.BadRequest("Token error: " + err.message));
-      }
-      token_data = decoded;
-    });
+    try{
+      token_data = jwt.verify(data.token, config.secret);
+    }catch(e){
+      return next(new error.BadRequest("Token error: " + e.message));
+    }
 
     database.getConnection(function(err,connection){
       if(err) throw err;

@@ -1,11 +1,10 @@
-//3rd party modules
 var mysql = require("mysql"),
     express = require("express"),
     bodyParser = require("body-parser"),
     winston = require("winston"),
     fs = require("fs"),
     https = require("https");
-//local modules
+
 var config = require("./config"),
     Parking = require("./controllers/Parking"),
     Debug = require("./controllers/Debug"),
@@ -60,10 +59,3 @@ var options = {
 https.createServer(options, app).listen(443,function(){
   logger.log("debug", "Server started.");
 });
-
-/*
-app.set('port', process.env.PORT || 443);
-app.listen(app.get('port'), function(){
-  logger.log("debug", "Listening on port " + app.get('port'));
-});
-*/
