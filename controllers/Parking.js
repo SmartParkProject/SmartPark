@@ -61,7 +61,7 @@ module.exports = function Parking(database, logger){
   });
 
   router.post("/", function(req, res, next) {
-    data = req.body;
+    var data = req.body;
     var valid = ajv.validate(transactionSchema, data);
     if(!valid)
       return next(new error.BadRequest("Bad parameter: " + ajv.errorsText()));

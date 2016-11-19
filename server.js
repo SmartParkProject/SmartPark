@@ -2,11 +2,13 @@
 var mysql = require("mysql"),
     express = require("express"),
     bodyParser = require("body-parser"),
-    winston = require("winston");
+    winston = require("winston"),
+    passport = require("passport");
 //local modules
 var config = require("./config"),
     Parking = require("./controllers/Parking"),
     Debug = require("./controllers/Debug"),
+    Account = require("./controllers/Account"),
     error = require("./utilities/error");
 
 var app = express();
@@ -26,6 +28,7 @@ var database = mysql.createPool(config.db);
 
 //Middleware
 app.use(bodyParser.json());
+app.use(passport.initialize());
 app.use(function(req, res, next){
   logger.log("debug", "("+(new Date()).toLocaleString()+") " + req.ip + " - " + req.method + " " + req.originalUrl);
   next();
@@ -33,8 +36,10 @@ app.use(function(req, res, next){
 
 //Routes
 var parking = new Parking(database, logger);
+var account = new Account(database, logger, passport);
 
 app.use("/parking", parking);
+app.use("/account", account);
 
 if(process.env.NODE_ENV !== 'production'){
   logger.log("warn","!!!DEBUG FEATURES ACTIVE");
