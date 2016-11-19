@@ -5,6 +5,7 @@ module.exports = {
     password:"password",
     database:"smartpark"
   },
+  secret:"secret",
   max_parking_spots:100,
   min_reserve_length:1,
   max_reserve_length:24

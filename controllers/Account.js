@@ -1,7 +1,8 @@
 var express = require("express"),
     LocalStrategy = require("passport-local").Strategy,
     Ajv = require("ajv")
-    crypto = require("crypto");
+    crypto = require("crypto"),
+    jwt = require("jsonwebtoken");
 
 var error = require("../utilities/error");
 
@@ -61,6 +62,8 @@ module.exports = function(database, logger, passport){
 
   router.post("/login", passport.authenticate("local", function(req, res){
     req.user.username;
+    var token = jwt.sign({user:req.user.username}, config.secret, {expiresIn:"30d"}); //webtokens are pretty neat. Data embedded in token, used as authentication.
+    res.json({status:200, result:token});
     //Now we want to generate a token for the user. http://stackoverflow.com/questions/17397052/nodejs-passport-authentication-token
   }));
 
@@ -81,7 +84,7 @@ module.exports = function(database, logger, passport){
             connection.release();
             if(err) throw err;
             res.status(201);
-            res.json({"status":201, "result": "Successfully created account."}); //Probably just going to redirect to login page on success
+            res.json({status:201, result:"Successfully created account."}); //Probably just going to redirect to login page on success
           });
         }else{
           return next(new error.BadRequest("Account already exists with username: " + data.username));

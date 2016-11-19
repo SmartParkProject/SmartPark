@@ -47,3 +47,5 @@ jspm_packages
 sql/run.bat
 config.js
 notes.txt
+server.key
+server.crt
