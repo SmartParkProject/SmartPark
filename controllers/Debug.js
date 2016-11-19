@@ -10,7 +10,6 @@ module.exports = function Debug(database, logger, parking){
       connection.query("DELETE FROM transactions",function(err, results){
         connection.release();
         if(err) throw err;
-        parking.buildParkingState();
         res.status(200);
         res.send("Records deleted.");
       });
@@ -40,7 +39,6 @@ module.exports = function Debug(database, logger, parking){
           done++;
           if(done==total){ //This is a bad way of doing this. That being said; debug code.
             connection.release();
-            parking.buildParkingState();
             res.status(200);
             res.send("Records filled with random data.");
           }

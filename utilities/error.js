@@ -29,6 +29,7 @@ var ErrorFactory = function(){
 errorFactory = new ErrorFactory();
 
 exports.BadRequest = errorFactory.getAPIError(400, "Bad request.");
+exports.Unauthorized = errorFactory.getAPIError(401, "Missing or invalid authentication token.");
 exports.Forbidden = errorFactory.getAPIError(403, "Permissions not met for the request.");
 exports.NotFound = errorFactory.getAPIError(404, "The requested resource couldn't be found.");
 exports.Conflict = errorFactory.getAPIError(409, "There was a conflict with the request.");
