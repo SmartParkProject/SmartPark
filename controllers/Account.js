@@ -46,9 +46,11 @@ module.exports = function Account(database, logger){
         if(results.length == 0)
           return next(new error.Unauthorized("Incorrect username or password.")); //Couldn't find a match for user
 
+        //TODO: Look into storing a token salt with users data to allow for manual invalidation of tokens.
+        //Also: consider adjusting expiration timer. Spec: https://tools.ietf.org/id/draft-ietf-oauth-jwt-bearer-05.html
         var key = crypto.pbkdf2Sync(data.password, results[0].salt, 100000, 64, "sha512");
         if(key.toString("hex") == results[0].password){ //We have a match.
-          var token = jwt.sign({userid:results[0].id}, config.secret, {expiresIn:"30d"}); //webtokens are pretty neat. Data embedded in token, used as authentication.
+          var token = jwt.sign({userid:results[0].id}, config.secret, {expiresIn:"30d"});
           res.json({status:200, result:token});
         }else{
           return next(new error.Unauthorized("Incorrect username or password."));
