@@ -12,12 +12,12 @@ module.exports = function Payment(database, logger){
     if(!data.token)
       return next(new error.BadRequest("No token provided."));
 
-      var token_data;
-      try{
-        token_data = jwt.verify(data.token, config.secret);
-      }catch(e){
-        return next(new error.BadRequest("Token error: " + e.message));
-      }
+    var token_data;
+    try{
+      token_data = jwt.verify(data.token, config.secret);
+    }catch(e){
+      return next(new error.Authentication("Token error: " + e.message));
+    }
 
     //TODO: This is temporary. The transaction should be moved to cold storage, not deleted.
     database.getConnection(function(err,connection){
@@ -26,7 +26,7 @@ module.exports = function Payment(database, logger){
         connection.release();
         if(err) throw err;
         if(results.affectedRows == 0){
-          return next(new error.BadRequest("No transactions for user."));
+          return next(new error.NotFound("No transactions for user."));
         }else{
           res.status(200);
           res.json({status:"200", result:"Successfully removed transaction for user."});

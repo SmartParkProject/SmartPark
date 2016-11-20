@@ -53,8 +53,8 @@ if(process.env.NODE_ENV !== 'production'){
 app.use(new error.Handler(logger));
 
 var options = {
-  cert: fs.readFileSync("server.crt"),
-  key: fs.readFileSync("server.key")
+  cert: fs.readFileSync("fullchain.pem"),
+  key: fs.readFileSync("privkey.pem")
 };
 https.createServer(options, app).listen(443,function(){
   logger.log("debug", "Server started.");

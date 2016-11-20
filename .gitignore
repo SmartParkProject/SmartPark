@@ -49,3 +49,4 @@ config.js
 notes.txt
 server.key
 server.crt
+*.pem

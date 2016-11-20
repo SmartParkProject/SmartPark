@@ -79,7 +79,7 @@ module.exports = function Account(database, logger){
             res.json({status:201, result:"Successfully created account."});
           });
         }else{
-          return next(new error.BadRequest("Account already exists with username: " + data.username));
+          return next(new error.Conflict("Account already exists with username: " + data.username));
         }
       });
     });
