@@ -10,7 +10,6 @@ module.exports = function Debug(database, logger, parking){
       connection.query("DELETE FROM transactions",function(err, results){
         connection.release();
         if(err) throw err;
-        parking.buildParkingState();
         res.status(200);
         res.send("Records deleted.");
       });
@@ -18,6 +17,7 @@ module.exports = function Debug(database, logger, parking){
   });
 
   router.get("/fill", function(req, res, next) {
+    return; //Currently non-functional
     database.getConnection(function(err,connection){
       //In theory, these variables are local to the callback for getconnection
       //and should not be modified by subsequent calls to /fill.
@@ -40,7 +40,6 @@ module.exports = function Debug(database, logger, parking){
           done++;
           if(done==total){ //This is a bad way of doing this. That being said; debug code.
             connection.release();
-            parking.buildParkingState();
             res.status(200);
             res.send("Records filled with random data.");
           }

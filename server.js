@@ -1,14 +1,15 @@
-//3rd party modules
 var mysql = require("mysql"),
     express = require("express"),
     bodyParser = require("body-parser"),
     winston = require("winston"),
-    passport = require("passport");
-//local modules
+    fs = require("fs"),
+    https = require("https");
+
 var config = require("./config"),
     Parking = require("./controllers/Parking"),
     Debug = require("./controllers/Debug"),
     Account = require("./controllers/Account"),
+    Payment = require("./controllers/Payment"),
     error = require("./utilities/error");
 
 var app = express();
@@ -28,7 +29,6 @@ var database = mysql.createPool(config.db);
 
 //Middleware
 app.use(bodyParser.json());
-app.use(passport.initialize());
 app.use(function(req, res, next){
   logger.log("debug", "("+(new Date()).toLocaleString()+") " + req.ip + " - " + req.method + " " + req.originalUrl);
   next();
@@ -36,9 +36,11 @@ app.use(function(req, res, next){
 
 //Routes
 var parking = new Parking(database, logger);
-var account = new Account(database, logger, passport);
+var payment = new Payment(database, logger);
+var account = new Account(database, logger);
 
 app.use("/parking", parking);
+app.use("/payment", payment);
 app.use("/account", account);
 
 if(process.env.NODE_ENV !== 'production'){
@@ -50,7 +52,10 @@ if(process.env.NODE_ENV !== 'production'){
 //Error handling
 app.use(new error.Handler(logger));
 
-app.set('port', process.env.PORT || 80);
-app.listen(app.get('port'), function(){
-  logger.log("debug", "Listening on port " + app.get('port'));
+var options = {
+  cert: fs.readFileSync("fullchain.pem"),
+  key: fs.readFileSync("privkey.pem")
+};
+https.createServer(options, app).listen(443,function(){
+  logger.log("debug", "Server started.");
 });

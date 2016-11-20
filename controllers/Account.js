@@ -1,10 +1,10 @@
 var express = require("express"),
-    LocalStrategy = require("passport-local").Strategy,
     Ajv = require("ajv")
     crypto = require("crypto"),
     jwt = require("jsonwebtoken");
 
-var error = require("../utilities/error");
+var config = require("../config"),
+    error = require("../utilities/error");
 
 var ajv = new Ajv();
 var accountSchema = {
@@ -29,43 +29,35 @@ var passwordSchema = {
 ajv.addSchema(usernameSchema, "/username");
 ajv.addSchema(passwordSchema, "/password");
 
-module.exports = function(database, logger, passport){
+module.exports = function Account(database, logger){
   var router = express.Router();
-  //It might be worthwhile to figure out how to return messages in json format.
-  passport.use(new LocalStrategy({
-    passReqToCallback: true,
-    session: false
-  },
-  function(req, username, password, done) {
+
+  router.post("/login", function(req, res, next){
     var data = req.body;
     var valid = ajv.validate(accountSchema, data);
     if(!valid)
-      return done(null, false, {message: ajv.errorsText()});
+      return next(new error.BadRequest("Bad parameter: " + ajv.errorsText()));
 
     database.getConnection(function(err, connection){
       if(err) throw err;
-      connection.query("SELECT username, password, salt FROM users WHERE username=?", [data.username], function(err, results){
+      connection.query("SELECT id, username, password, salt FROM users WHERE username=?", [data.username], function(err, results){
         connection.release();
         if(err) throw err;
+        if(results.length == 0)
+          return next(new error.Unauthorized("Incorrect username or password.")); //Couldn't find a match for user
 
-        if(results.length == 0) return done(null, false); //Couldn't find a match for user
-
-        var key = crypto.pbkdf2Sync(data.password, results[0].salt, 100000, 512, "sha512");
-        if(key.toString("hex") == results[0].password){
-          return done(null, data.username);
+        //TODO: Look into storing a token salt with users data to allow for manual invalidation of tokens.
+        //Also: consider adjusting expiration timer. Spec: https://tools.ietf.org/id/draft-ietf-oauth-jwt-bearer-05.html
+        var key = crypto.pbkdf2Sync(data.password, results[0].salt, 100000, 64, "sha512");
+        if(key.toString("hex") == results[0].password){ //We have a match.
+          var token = jwt.sign({userid:results[0].id}, config.secret, {expiresIn:"30d"});
+          res.json({status:200, result:token});
         }else{
-          return done(null, false);
+          return next(new error.Unauthorized("Incorrect username or password."));
         }
       });
     });
-  }));
-
-  router.post("/login", passport.authenticate("local", function(req, res){
-    req.user.username;
-    var token = jwt.sign({user:req.user.username}, config.secret, {expiresIn:"30d"}); //webtokens are pretty neat. Data embedded in token, used as authentication.
-    res.json({status:200, result:token});
-    //Now we want to generate a token for the user. http://stackoverflow.com/questions/17397052/nodejs-passport-authentication-token
-  }));
+  });
 
   router.post("/register", function(req, res, next){
     var data = req.body;
@@ -79,18 +71,32 @@ module.exports = function(database, logger, passport){
         if(err) throw err;
         if(results.length!=0){
           salt = crypto.randomBytes(16).toString("hex");
-          key = crypto.pbkdf2Sync(data.password, salt, 100000, 512, "sha512");
+          key = crypto.pbkdf2Sync(data.password, salt, 100000, 64, "sha512");
           connection.query("INSERT INTO users (username, password, salt) VALUES(?, ?, ?)", [data.username, key.toString("hex"), salt], function(err, results){
             connection.release();
             if(err) throw err;
             res.status(201);
-            res.json({status:201, result:"Successfully created account."}); //Probably just going to redirect to login page on success
+            res.json({status:201, result:"Successfully created account."});
           });
         }else{
-          return next(new error.BadRequest("Account already exists with username: " + data.username));
+          return next(new error.Conflict("Account already exists with username: " + data.username));
         }
       });
     });
+  });
+
+  router.post("/checktoken", function(req, res, next){
+    var data = req.body;
+    if(!data.token)
+      return next(new error.BadRequest("No token provided."));
+
+    try{
+      jwt.verify(data.token, config.secret);
+    }catch(e){
+      return next(new error.BadRequest("Token error: " + e.message));
+    }
+    res.status(200);
+    res.json({status:200, result:"Token is valid."});
   });
 
   return router;
