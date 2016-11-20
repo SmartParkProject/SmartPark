@@ -50,7 +50,7 @@ module.exports = function Parking(database, logger){
     try{
       token_data = jwt.verify(data.token, config.secret);
     }catch(e){
-      return next(new error.Authentication("Token error: " + e.message));
+      return next(new error.Unauthorized("Token error: " + e.message));
     }
 
     database.getConnection(function(err, connection){
@@ -141,7 +141,7 @@ module.exports = function Parking(database, logger){
     try{
       token_data = jwt.verify(data.token, config.secret);
     }catch(e){
-      return next(new error.Authentication("Token error: " + e.message));
+      return next(new error.Unauthorized("Token error: " + e.message));
     }
 
     database.getConnection(function(err,connection){

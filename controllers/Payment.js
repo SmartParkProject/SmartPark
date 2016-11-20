@@ -16,7 +16,7 @@ module.exports = function Payment(database, logger){
     try{
       token_data = jwt.verify(data.token, config.secret);
     }catch(e){
-      return next(new error.Authentication("Token error: " + e.message));
+      return next(new error.Unauthorized("Token error: " + e.message));
     }
 
     //TODO: This is temporary. The transaction should be moved to cold storage, not deleted.
