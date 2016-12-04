@@ -1,31 +1,18 @@
-var mysql = require("mysql"),
-    express = require("express"),
+var express = require("express"),
     bodyParser = require("body-parser"),
-    winston = require("winston"),
     fs = require("fs"),
     https = require("https");
 
 var config = require("./config"),
-    Parking = require("./controllers/Parking"),
-    Debug = require("./controllers/Debug"),
-    Account = require("./controllers/Account"),
-    Payment = require("./controllers/Payment"),
-    error = require("./utilities/error");
+    parking = require("./controllers/parking"),
+    debug = require("./controllers/debug"),
+    account = require("./controllers/account"),
+    payment = require("./controllers/payment"),
+    error = require("./utilities/error"),
+    logger = require("./utilities/logger"),
+    models = require("./models");
 
 var app = express();
-
-var logger = new (winston.Logger)({
-  transports: [
-    new (winston.transports.File)({
-      filename:"log/critical.log",
-      level:"info"
-    }),
-    new (winston.transports.Console)({level:"debug"})
-  ]
-});
-
-//Create connection pool for database.
-var database = mysql.createPool(config.db);
 
 //Middleware
 app.use(bodyParser.json());
@@ -35,27 +22,19 @@ app.use(function(req, res, next){
 });
 
 //Routes
-var parking = new Parking(database, logger);
-var payment = new Payment(database, logger);
-var account = new Account(database, logger);
-
 app.use("/parking", parking);
 app.use("/payment", payment);
 app.use("/account", account);
 
-if(process.env.NODE_ENV !== 'production'){
-  logger.log("warn","!!!DEBUG FEATURES ACTIVE");
-  var debug = new Debug(database, logger, parking);
-  app.use("/debug", debug);
-}
-
 //Error handling
-app.use(new error.Handler(logger));
+app.use(error.Handler);
 
-var options = {
-  cert: fs.readFileSync("fullchain.pem"),
-  key: fs.readFileSync("privkey.pem")
-};
-https.createServer(options, app).listen(443,function(){
-  logger.log("debug", "Server started.");
+models.sequelize.sync().then(function(){
+  var options = {
+    cert: fs.readFileSync("fullchain.pem"),
+    key: fs.readFileSync("privkey.pem")
+  };
+  https.createServer(options, app).listen(443,function(){
+    logger.log("debug", "Server started.");
+  });
 });

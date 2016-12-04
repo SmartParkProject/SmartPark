@@ -2,39 +2,32 @@ var express = require("express"),
     jwt = require("jsonwebtoken");
 
 var config = require("../config"),
-    error = require("../utilities/error");
+    error = require("../utilities/error"),
+    models = require("../models");
 
-module.exports = function Payment(database, logger){
-  var router = express.Router();
+var router = express.Router();
 
-  router.post("/checkout",function(req, res, next){
-    var data = req.body;
-    if(!data.token)
-      return next(new error.BadRequest("No token provided."));
+router.post("/checkout",function(req, res, next){
+  var data = req.body;
+  if(!data.token)
+    return next(new error.BadRequest("No token provided."));
 
-    var token_data;
-    try{
-      token_data = jwt.verify(data.token, config.secret);
-    }catch(e){
-      return next(new error.Unauthorized("Token error: " + e.message));
-    }
+  var token_data;
+  try{
+    token_data = jwt.verify(data.token, config.secret);
+  }catch(e){
+    return next(new error.Unauthorized("Token error: " + e.message));
+  }
 
-    //TODO: This is temporary. The transaction should be moved to cold storage, not deleted.
-    database.getConnection(function(err,connection){
-      if(err) throw err;
-      connection.query("DELETE FROM transactions WHERE userid = ?", [token_data.userid], function(err, results){
-        connection.release();
-        if(err) throw err;
-        if(results.affectedRows == 0){
-          return next(new error.NotFound("No transactions for user."));
-        }else{
-          res.status(200);
-          res.json({status:"200", result:"Successfully removed transaction for user."});
-        }
-      });
-    });
-    //Payment stuff will be added later. For now we are just removing user from spot.
-  });
+  //TODO: This is temporary. The transaction should be moved to cold storage, not deleted.
+  models.Transaction.destroy({where: {UserId: token_data.userid}}).then(function(rows){
+    if(rows == 0)
+      return Promise.reject(new error.NotFound("No transactions for user."));
 
-  return router;
-}
+    res.status(200);
+    res.json({status:"200", result:"Successfully removed transaction for user."});
+  }).catch(next);
+  //Payment stuff will be added later. For now we are just removing user from spot.
+});
+
+module.exports = router;

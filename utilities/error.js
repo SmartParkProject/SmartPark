@@ -1,17 +1,17 @@
 var exports = module.exports;
 
+var logger = require("./logger");
+
 const ERROR_API = 1;
 
-exports.Handler = function(logger){
-  return function(err, req, res, next){
-    if(err.type === ERROR_API){
-      logger.log("warn", req.ip, err);
-      res.status(err.statusCode);
-      res.json({status:err.statusCode, message:err.message});
-    }else{
-      logger.log("error", err);
-      next(err);
-    }
+exports.Handler = function(err, req, res, next){
+  if(err.type === ERROR_API){
+    logger.log("warn", "%s %s: %s", req.ip, req.method, req.originalUrl, err);
+    res.status(err.statusCode);
+    res.json({status:err.statusCode, message:err.message});
+  }else{
+    logger.log("error", err);
+    next(err);
   }
 }
 

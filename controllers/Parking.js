@@ -3,22 +3,18 @@ var express = require("express"),
     jwt = require("jsonwebtoken");
 
 var config = require("../config"),
-    error = require("../utilities/error");
+    error = require("../utilities/error"),
+    models = require("../models");
 
 var ajv = new Ajv();
 var transactionSchema = {
   "properties":{
     "spot":{"$ref":"/parkingspot"},
-    "reserve_length":{
-      "type":"integer",
-      "minimum":config.min_reserve_length,
-      "maximum":config.max_reserve_length
-    },
     "token":{
       "type":"string"
     }
   },
-  "required":["spot", "reserve_length", "token"]
+  "required":["spot", "token"]
 };
 
 var useridSchema = {
@@ -36,128 +32,83 @@ var parkingspotSchema = {
 ajv.addSchema(parkingspotSchema, "/parkingspot");
 ajv.addSchema(useridSchema, "/userid");
 
-module.exports = function Parking(database, logger){
-  var router = express.Router();
+var router = express.Router();
 
-  router.post("/", function(req, res, next){
-    var data = req.body;
-    var valid = ajv.validate(transactionSchema, data);
-    if(!valid)
-      return next(new error.BadRequest("Bad parameter: " + ajv.errorsText()));
+router.post("/", function(req, res, next){
+  var data = req.body;
+  var valid = ajv.validate(transactionSchema, data);
+  if(!valid)
+    return next(new error.BadRequest("Bad parameter: " + ajv.errorsText()));
 
-    //Verify token and get user id.
-    var token_data;
-    try{
-      token_data = jwt.verify(data.token, config.secret);
-    }catch(e){
-      return next(new error.Unauthorized("Token error: " + e.message));
+  //Verify token and get user id.
+  var token_data;
+  try{
+    token_data = jwt.verify(data.token, config.secret);
+  }catch(e){
+    return next(new error.Unauthorized("Token error: " + e.message));
+  }
+  models.Transaction.findAll({include: [models.User]}).then(function(transactions){
+    if(transactions.find(a => a.spot == data.spot))
+      return Promise.reject(new error.Conflict("Transaction already exists for parking spot with id: " + data.spot));
+
+    if(transactions.find(a => a.user.id == token_data.userid))
+      return Promise.reject(new error.Conflict("Transaction already exists for parking spot with id: " + data.spot));
+
+    models.Transaction.create({spot: data.spot, reserve_time: new Date(), UserId: token_data.userid}).then(function(transaction){
+      res.status(201);
+      res.json({status:"201", result:"Successfully checked-out parking spot."});
+    });
+  }).catch(next);
+});
+
+router.get("/available", function(req, res, next){
+  var converted_array = new Array(config.max_parking_spots);
+  for(var i = 0; i < config.max_parking_spots; i++){
+    converted_array[i] = 1;
+  }
+  models.Transaction.findAll().then(function(transactions){
+    for(var item in transactions){
+      converted_array[transactions[item].spot] = 0;
     }
-
-    database.getConnection(function(err, connection){
-      if(err) throw err;
-      connection.query("SELECT * FROM transactions", function(err, results){
-        if(err) throw err;
-        if(results.find(a => a.spot == data.spot))
-          return next(new error.Conflict("Transaction already exists for parking spot with id: " + data.spot));
-
-        if(results.find(a => a.userid == token_data.userid))
-          return next(new error.Conflict("Transaction already exists for user: " + token_data.userid));
-
-        connection.query("INSERT INTO transactions (userid, spot, reserve_time, reserve_length) VALUES(?, ?, ?, ?)", [token_data.userid, data.spot, new Date(), data.reserve_length], function(err, results){
-          connection.release();
-          if(err) throw err;
-          res.status(201);
-          res.json({status:"201", result:"Successfully checked-out parking spot."});
-        });
-      });
-    });
+    res.json({status:200, result:converted_array, count:converted_array.reduce((a, b) => a + b)});
   });
+});
 
-  router.get("/available", function(req, res, next){
-    var converted_array = new Array(config.max_parking_spots);
-    for(var i = 0; i < config.max_parking_spots; i++){
-      converted_array[i] = 1;
+router.get("/available/:id(\\d+)/", function(req, res, next){
+  req.params.id = parseInt(req.params.id);
+  var valid = ajv.validate(parkingspotSchema, req.params.id);
+  if(!valid)
+    return next(new error.BadRequest("Bad request: " + ajv.errorsText()));
+
+  models.Transaction.findOne({where: {spot: req.params.id}}).then(function(transaction){
+    if(transaction){
+      res.json({status:200, result:0});
+    }else{
+      res.json({status:200, result:1});
     }
-    database.getConnection(function(err, connection){
-      if(err) throw err;
-      connection.query("SELECT * FROM transactions", function(err, results){
-        connection.release();
-        if(err) throw err;
-        for(var item in results){
-          converted_array[results[item].spot] = 0;
-        }
-        res.json({status:200, result:converted_array, count:converted_array.reduce((a, b) => a + b)});
-      });
-    });
   });
+});
 
-  router.get("/available/:id(\\d+)/", function(req, res, next){
-    req.params.id = parseInt(req.params.id);
-    var valid = ajv.validate(parkingspotSchema, req.params.id);
-    if(!valid)
-      return next(new error.BadRequest("Bad request: " + ajv.errorsText()));
+router.post("/status", function(req, res, next){
+  var data = req.body;
+  if(!data.token)
+    return next(new error.BadRequest("No token provided."));
 
-    database.getConnection(function(err, connection){
-      if(err) throw err;
-      connection.query("SELECT * FROM transactions", function(err, results){
-        connection.release();
-        if(err) throw err;
-        if(results.find(a => a.spot == req.params.id)){
-          res.json({status:200, result:0});
-        }else{
-          res.json({status:200, result:1});
-        }
-      });
-    });
-  });
+  var token_data;
+  try{
+    token_data = jwt.verify(data.token, config.secret);
+  }catch(e){
+    return next(new error.Unauthorized("Token error: " + e.message));
+  }
 
-  router.get("/spot/:id(\\d+)/", function(req, res, next){
-    req.params.id = parseInt(req.params.id);
-    var valid = ajv.validate(parkingspotSchema, req.params.id);
-    if(!valid)
-      return next(new error.BadRequest("Bad request: " + ajv.errorsText()));
-
-    database.getConnection(function(err,connection){
-      if(err) throw err;
-      connection.query("SELECT reserve_time, reserve_length FROM transactions WHERE spot=?", req.params.id, function(err, results){
-        connection.release();
-        if(err) throw err;
-        if(results[0]){
-          res.status(200);
-          res.json({status:200, result:results[0]});
-        }else{
-          next(new error.NotFound("No transactional information for parking spot with id: " + req.params.id));
-        }
-      });
-    });
-  });
-
-  router.post("/status", function(req, res, next){
-    var data = req.body;
-    if(!data.token)
-      return next(new error.BadRequest("No token provided."));
-
-    var token_data;
-    try{
-      token_data = jwt.verify(data.token, config.secret);
-    }catch(e){
-      return next(new error.Unauthorized("Token error: " + e.message));
+  models.User.findOne({where: {id: token_data.userid}, include: [models.Transaction]}).then(function(user){
+    if(user.transaction){
+      res.status(200);
+      res.json({status:200, result:user.transaction});
+    }else{
+      Promise.reject(new error.NotFound("No transactional information for user."));
     }
+  }).catch(next);
+});
 
-    database.getConnection(function(err,connection){
-      if(err) throw err;
-      connection.query("SELECT spot, reserve_time, reserve_length FROM transactions WHERE userid=?", token_data.userid, function(err, results){
-        connection.release();
-        if(err) throw err;
-        if(results[0]){
-          res.status(200);
-          res.json({status:200, result:results[0]});
-        }else{
-          next(new error.NotFound("No transactional information for user."));
-        }
-      });
-    });
-  });
-
-  return router;
-}
+module.exports = router;
