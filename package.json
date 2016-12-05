@@ -16,6 +16,8 @@
     "express": "^4.14.0",
     "jsonwebtoken": "^7.1.9",
     "mysql": "^2.11.1",
+    "sequelize": "^3.27.0",
+    "sequelize-cli": "^2.4.0",
     "winston": "^2.2.0"
   },
   "devDependencies": {},
