@@ -4,10 +4,10 @@ var express = require("express"),
     https = require("https");
 
 var config = require("./config"),
-    parking = require("./controllers/parking"),
-    debug = require("./controllers/debug"),
-    account = require("./controllers/account"),
-    payment = require("./controllers/payment"),
+    parking = require("./routes/parking"),
+    debug = require("./routes/debug"),
+    account = require("./routes/account"),
+    payment = require("./routes/payment"),
     error = require("./utilities/error"),
     logger = require("./utilities/logger"),
     models = require("./models");
@@ -19,6 +19,11 @@ app.use(bodyParser.json());
 app.use(function(req, res, next){
   logger.log("debug", "("+(new Date()).toLocaleString()+") " + req.ip + " - " + req.method + " " + req.originalUrl);
   next();
+});
+
+process.on('unhandledRejection', (reason, p) => {
+  console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
+  // application specific logging, throwing an error, or other logic here
 });
 
 //Routes

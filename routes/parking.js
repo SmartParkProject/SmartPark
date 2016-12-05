@@ -49,10 +49,10 @@ router.post("/", function(req, res, next){
   }
   models.Transaction.findAll({include: [models.User]}).then(function(transactions){
     if(transactions.find(a => a.spot == data.spot))
-      return Promise.reject(new error.Conflict("Transaction already exists for parking spot with id: " + data.spot));
+      throw new error.Conflict("Transaction already exists for parking spot with id: " + data.spot);
 
     if(transactions.find(a => a.user.id == token_data.userid))
-      return Promise.reject(new error.Conflict("Transaction already exists for parking spot with id: " + data.spot));
+      throw new error.Conflict("Transaction already exists for parking spot with id: " + data.spot);
 
     models.Transaction.create({spot: data.spot, reserve_time: new Date(), UserId: token_data.userid}).then(function(transaction){
       res.status(201);
@@ -106,7 +106,7 @@ router.post("/status", function(req, res, next){
       res.status(200);
       res.json({status:200, result:user.transaction});
     }else{
-      Promise.reject(new error.NotFound("No transactional information for user."));
+      throw new error.NotFound("No transactional information for user.");
     }
   }).catch(next);
 });

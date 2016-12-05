@@ -22,7 +22,7 @@ router.post("/checkout",function(req, res, next){
   //TODO: This is temporary. The transaction should be moved to cold storage, not deleted.
   models.Transaction.destroy({where: {UserId: token_data.userid}}).then(function(rows){
     if(rows == 0)
-      return Promise.reject(new error.NotFound("No transactions for user."));
+      throw new error.NotFound("No transactions for user.");
 
     res.status(200);
     res.json({status:"200", result:"Successfully removed transaction for user."});

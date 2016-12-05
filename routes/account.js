@@ -40,7 +40,7 @@ router.post("/login", function(req, res, next){
 
   models.User.findOne({where: {username: data.username}}).then(function(user){
     if(!user)
-      return Promise.reject(new error.Unauthorized("Incorrect username or password."));
+      throw new error.Unauthorized("Incorrect username or password.");
 
     //TODO: Look into storing a token salt with users data to allow for manual invalidation of tokens.
     //Also: consider adjusting expiration timer. Spec: https://tools.ietf.org/id/draft-ietf-oauth-jwt-bearer-05.html
@@ -49,7 +49,7 @@ router.post("/login", function(req, res, next){
       var token = jwt.sign({userid:user.id}, config.secret, {expiresIn:"30d"});
       res.json({status:200, result:token});
     }else{
-      return Promise.reject(new error.Unauthorized("Incorrect username or password."));
+      throw new error.Unauthorized("Incorrect username or password.");
     }
   }).catch(next);
 });
@@ -62,7 +62,7 @@ router.post("/register", function(req, res, next){
 
   models.User.findOne({where: {username: data.username}}).then(function(user){
     if(user)
-      return Promise.reject(new error.Conflict("Account already exists with username: " + data.username));
+      throw new error.Conflict("Account already exists with username: " + data.username);
 
     salt = crypto.randomBytes(16).toString("hex");
     key = crypto.pbkdf2Sync(data.password, salt, 100000, 64, "sha512").toString("hex");
