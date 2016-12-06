@@ -4,7 +4,7 @@
   "description": "CSC 383 group project",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "set NODE_ENV=test&& mocha&&set NODE_ENV=development",
     "start": "set NODE_ENV=production&& node ./server"
   },
   "author": "Seth Immel",
@@ -17,10 +17,13 @@
     "jsonwebtoken": "^7.1.9",
     "mysql": "^2.11.1",
     "sequelize": "^3.27.0",
-    "sequelize-cli": "^2.4.0",
     "winston": "^2.2.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": "^3.2.0",
+    "sequelize-cli": "^2.4.0",
+    "supertest": "^2.0.1"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aierou/SmartPark.git"

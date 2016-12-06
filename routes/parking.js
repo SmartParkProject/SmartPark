@@ -102,7 +102,7 @@ router.post("/status", function(req, res, next){
   }
 
   models.User.findOne({where: {id: token_data.userid}, include: [models.Transaction]}).then(function(user){
-    if(user.transaction){
+    if(user.Transaction){
       res.status(200);
       res.json({status:200, result:user.transaction});
     }else{
