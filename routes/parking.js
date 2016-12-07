@@ -51,8 +51,8 @@ router.post("/", function(req, res, next){
     if(transactions.find(a => a.spot == data.spot))
       throw new error.Conflict("Transaction already exists for parking spot with id: " + data.spot);
 
-    if(transactions.find(a => a.user.id == token_data.userid))
-      throw new error.Conflict("Transaction already exists for parking spot with id: " + data.spot);
+    if(transactions.find(a => a.User.id == token_data.userid))
+      throw new error.Conflict("Transaction already exists for user.");
 
     models.Transaction.create({spot: data.spot, reserve_time: new Date(), UserId: token_data.userid}).then(function(transaction){
       res.status(201);
@@ -102,7 +102,7 @@ router.post("/status", function(req, res, next){
   }
 
   models.User.findOne({where: {id: token_data.userid}, include: [models.Transaction]}).then(function(user){
-    if(user.Transaction){
+    if(user.Transaction){ //For some reason this "Transaction" needs to be capitalized
       res.status(200);
       res.json({status:200, result:user.transaction});
     }else{
