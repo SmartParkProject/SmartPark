@@ -25,9 +25,11 @@ if(process.env.NODE_ENV == "development"){
 }
 
 //Routes
-app.use("/parking", parking);
-app.use("/payment", payment);
-app.use("/account", account);
+var api = express.Router();
+api.use("/parking", parking);
+api.use("/payment", payment);
+api.use("/account", account);
+app.use("/api", api);
 
 //Error handling
 app.use(error.Handler);
@@ -39,7 +41,7 @@ var lex = require('greenlock-express').create({
   approveDomains: config.ssl.domains,
   agreeTos: true,
   email: config.ssl.email,
-  debug: true
+  debug: (process.env.NODE_ENV != "production")
 });
 
 http.createServer(lex.middleware(require('redirect-https')())).listen(80, function () {
