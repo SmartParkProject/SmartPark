@@ -8,7 +8,7 @@ module.exports = {
       dialect:"mysql",
       logging:false
     },
-    development:{
+    production:{
       host:"localhost",
       username:"username",
       password:"password",
