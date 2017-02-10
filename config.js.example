@@ -19,7 +19,8 @@ module.exports = {
   },
   ssl:{
     email:"email",
-    domains:["domain"]
+    domains:["domain"],
+    server:"staging"
   },
   secret:"secret",
   max_parking_spots:100,

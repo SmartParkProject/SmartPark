@@ -37,7 +37,7 @@ app.use(error.Handler);
 //Handle SSL stuff
 var lex = require('greenlock-express').create({
   // set to https://acme-v01.api.letsencrypt.org/directory in production
-  server: (process.env.NODE_ENV == "production") ? "https://acme-v01.api.letsencrypt.org/directory" : "staging",
+  server: config.ssl.server,
   approveDomains: config.ssl.domains,
   agreeTos: true,
   email: config.ssl.email,
