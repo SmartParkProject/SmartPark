@@ -1,9 +1,21 @@
 module.exports = {
   db:{
-    host:"localhost",
-    user:"username",
-    password:"password",
-    database:"smartpark"
+    test:{
+      host:"localhost",
+      username:"username",
+      password:"password",
+      database:"smartpark_test",
+      dialect:"mysql",
+      logging:false
+    },
+    development:{
+      host:"localhost",
+      username:"username",
+      password:"password",
+      database:"smartpark",
+      dialect:"mysql",
+      logging:false
+    }
   },
   secret:"secret",
   max_parking_spots:100,

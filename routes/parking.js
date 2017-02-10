@@ -21,13 +21,13 @@ var useridSchema = {
   "type":"string",
   "minLength":15,
   "maxLength":15
-}
+};
 
 var parkingspotSchema = {
   "type":"integer",
   "minimum":0,
   "maximum":config.max_parking_spots
-}
+};
 
 ajv.addSchema(parkingspotSchema, "/parkingspot");
 ajv.addSchema(useridSchema, "/userid");
