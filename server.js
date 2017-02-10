@@ -35,10 +35,10 @@ app.use(error.Handler);
 //Handle SSL stuff
 var lex = require('greenlock-express').create({
   // set to https://acme-v01.api.letsencrypt.org/directory in production
-  server: 'staging',
-  approveDomains: ["smartparkproject.tk"],
+  server: (process.env.NODE_ENV == "production") ? "https://acme-v01.api.letsencrypt.org/directory" : "staging",
+  approveDomains: config.ssl.domains,
   agreeTos: true,
-  email: "simmel@umflint.edu",
+  email: config.ssl.email,
   debug: true
 });
 

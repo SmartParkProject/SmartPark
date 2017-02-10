@@ -17,6 +17,10 @@ module.exports = {
       logging:false
     }
   },
+  ssl:{
+    email:"email",
+    domains:["domain"]
+  },
   secret:"secret",
   max_parking_spots:100,
   min_reserve_length:1,
