@@ -1,7 +1,8 @@
 var express = require("express"),
     bodyParser = require("body-parser"),
     fs = require("fs"),
-    https = require("https");
+    https = require("https"),
+    http = require("http");
 
 var config = require("./config"),
     parking = require("./routes/parking"),
@@ -24,25 +25,36 @@ if(process.env.NODE_ENV == "development"){
 }
 
 //Routes
-app.use("/parking", parking);
-app.use("/payment", payment);
-app.use("/account", account);
+var api = express.Router();
+api.use("/parking", parking);
+api.use("/payment", payment);
+api.use("/account", account);
+app.use("/api", api);
 
 //Error handling
 app.use(error.Handler);
 
-//This is not ideal. Perhaps I can abstract the app to its own module and handle
-//db connection and so forth in a parent module.
+//Handle SSL stuff
+var lex = require('greenlock-express').create({
+  // set to https://acme-v01.api.letsencrypt.org/directory in production
+  server: (process.env.NODE_ENV == "production") ? "https://acme-v01.api.letsencrypt.org/directory" : "staging",
+  approveDomains: config.ssl.domains,
+  agreeTos: true,
+  email: config.ssl.email,
+  debug: (process.env.NODE_ENV != "production")
+});
+
+http.createServer(lex.middleware(require('redirect-https')())).listen(80, function () {
+  logger.log("debug", "Listening for ACME http-01 challenges");
+});
+
 var start = function(){
-  var options = {
-    cert: fs.readFileSync("fullchain.pem"),
-    key: fs.readFileSync("privkey.pem")
-  };
-  https.createServer(options, app).listen(443,function(){
-    logger.log("debug", "Server started.");
+  https.createServer(lex.httpsOptions, lex.middleware(app)).listen(443, function () {
+    logger.log("debug", "Listening for connections");
   });
 }
 
+//Handle orm stuff
 if(process.env.NODE_ENV == "test"){
   start();
 }else{
