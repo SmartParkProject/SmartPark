@@ -6,6 +6,7 @@ var express = require("express"),
 
 var config = require("./config"),
     parking = require("./routes/parking"),
+    statistics = require("./routes/statistics"),
     debug = require("./routes/debug"),
     account = require("./routes/account"),
     payment = require("./routes/payment"),
@@ -29,6 +30,7 @@ var api = express.Router();
 api.use("/parking", parking);
 api.use("/payment", payment);
 api.use("/account", account);
+api.use("/statistics", statistics);
 app.use("/api", api);
 
 //Error handling
