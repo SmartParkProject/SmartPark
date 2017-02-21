@@ -1,5 +1,6 @@
 module.exports = function(sequelize, DataTypes) {
   var Transaction = sequelize.define("Transaction", {
+    lot: DataTypes.INTEGER,
     spot: DataTypes.INTEGER,
     reserve_time: DataTypes.DATE
   }, {
