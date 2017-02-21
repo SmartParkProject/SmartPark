@@ -12,25 +12,21 @@ var transactionSchema = {
     "spot":{"$ref":"/parkingspot"},
     "token":{
       "type":"string"
+    },
+    "lot":{
+      "type":"integer",
+      "minimum":0
     }
   },
   "required":["spot", "token"]
 };
 
-var useridSchema = {
-  "type":"string",
-  "minLength":15,
-  "maxLength":15
-};
-
 var parkingspotSchema = {
   "type":"integer",
-  "minimum":0,
-  "maximum":config.max_parking_spots
+  "minimum":0
 };
 
 ajv.addSchema(parkingspotSchema, "/parkingspot");
-ajv.addSchema(useridSchema, "/userid");
 
 var router = express.Router();
 
@@ -47,47 +43,28 @@ router.post("/", function(req, res, next){
   }catch(e){
     return next(new error.Unauthorized("Token error: " + e.message));
   }
-  models.Transaction.findAll({include: [models.User]}).then(function(transactions){
-    if(transactions.find(a => a.spot == data.spot))
-      throw new error.Conflict("Transaction already exists for parking spot with id: " + data.spot);
+  models.Lot.findOne({where: {id:data.lot}}).then(function(lot){ //Check if lot id is valid
+    if(!lot)
+      throw new error.BadRequest("No lot with id: " + data.lot);
 
-    if(transactions.find(a => a.User.id == token_data.userid))
-      throw new error.Conflict("Transaction already exists for user.");
+    if(data.lot > lot.spots)
+      throw new error.BadRequest("Spot number out of bounds for lot");
 
-    models.Transaction.create({spot: data.spot, reserve_time: new Date(), UserId: token_data.userid}).then(function(transaction){
-      res.status(201);
-      res.json({status:"201", result:"Successfully checked-out parking spot."});
-    });
+    models.Transaction.findAll({include: [models.User]}).then(function(transactions){
+      if(transactions.find(a => a.spot == data.spot && a.lot == data.lot))
+        throw new error.Conflict("Transaction already exists for parking spot with id: " + data.spot);
+
+      if(transactions.find(a => a.User.id == token_data.userid))
+        throw new error.Conflict("Transaction already exists for user.");
+
+      models.Transaction.create({lot: data.lot, spot: data.spot, reserve_time: new Date(), UserId: token_data.userid}).then(function(transaction){
+        res.status(201);
+        res.json({status:"201", result:"Successfully checked-out parking spot."});
+      });
+    }).catch(next);
   }).catch(next);
 });
 
-router.get("/available", function(req, res, next){
-  var converted_array = new Array(config.max_parking_spots);
-  for(var i = 0; i < config.max_parking_spots; i++){
-    converted_array[i] = 1;
-  }
-  models.Transaction.findAll().then(function(transactions){
-    for(var item in transactions){
-      converted_array[transactions[item].spot] = 0;
-    }
-    res.json({status:200, result:converted_array, count:converted_array.reduce((a, b) => a + b)});
-  });
-});
-
-router.get("/available/:id(\\d+)/", function(req, res, next){
-  req.params.id = parseInt(req.params.id);
-  var valid = ajv.validate(parkingspotSchema, req.params.id);
-  if(!valid)
-    return next(new error.BadRequest("Bad request: " + ajv.errorsText()));
-
-  models.Transaction.findOne({where: {spot: req.params.id}}).then(function(transaction){
-    if(transaction){
-      res.json({status:200, result:0});
-    }else{
-      res.json({status:200, result:1});
-    }
-  });
-});
 
 router.post("/status", function(req, res, next){
   var data = req.body;
