@@ -19,7 +19,7 @@ var app = express();
 
 //Middleware
 app.use(bodyParser.json());
-if(process.env.NODE_ENV == "development"){
+if(true || process.env.NODE_ENV == "development"){
   app.use(function(req, res, next){
     logger.log("debug", "("+(new Date()).toLocaleString()+") " + req.ip + " - " + req.method + " " + req.originalUrl);
     next();
