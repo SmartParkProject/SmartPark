@@ -81,7 +81,7 @@ router.post("/status", function(req, res, next){
   models.User.findOne({where: {id: token_data.userid}, include: [models.Transaction]}).then(function(user){
     if(user.Transaction){ //For some reason this "Transaction" needs to be capitalized
       res.status(200);
-      res.json({status:200, result:user.transaction});
+      res.json({status:200, result:user.Transaction});
     }else{
       throw new error.NotFound("No transactional information for user.");
     }
