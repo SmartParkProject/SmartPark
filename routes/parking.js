@@ -18,7 +18,7 @@ var transactionSchema = {
       "minimum":0
     }
   },
-  "required":["spot", "token"]
+  "required":["spot", "token", "lot"]
 };
 
 var parkingspotSchema = {
