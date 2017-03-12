@@ -11,6 +11,7 @@ var config = require("./config"),
     debug = require("./routes/debug"),
     account = require("./routes/account"),
     payment = require("./routes/payment"),
+    infraction = require("./routes/infraction"),
     error = require("./utilities/error"),
     logger = require("./utilities/logger"),
     models = require("./models");
@@ -25,7 +26,7 @@ if(true || process.env.NODE_ENV == "development"){
     next();
   });
 }
-app.all('/*', function(req, res, next) {
+app.all('/api/*', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "X-Requested-With, Content-Type");
   next();
@@ -38,6 +39,8 @@ api.use("/payment", payment);
 api.use("/account", account);
 api.use("/statistics", statistics);
 api.use("/lot", lot);
+api.use("/infraction", infraction);
+
 app.use("/api", api);
 
 //Error handling
