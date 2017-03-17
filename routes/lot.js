@@ -24,6 +24,23 @@ var searchSchema = {
   "required":["lat", "lng", "distance"]
 };
 
+var lotSchema = {
+  "name":{
+    "type":"string"
+  },
+  "lat":{
+    "type":"string"
+  },
+  "lng":{
+    "type":"string"
+  },
+  "spots":{
+    "type":"integer",
+    "minimum":0
+  },
+  "required":["name", "lat", "lng", "spots", "image_data", "lot_data", "spot_data", "token"]
+};
+
 var router = express.Router();
 
 router.get("/:id(\\d+)/available", function(req, res, next){
@@ -42,7 +59,67 @@ router.get("/:id(\\d+)/available", function(req, res, next){
         converted_array[transactions[item].spot] = 0;
       }
       res.json({status:200, result:converted_array, count:converted_array.reduce((a, b) => a + b)});
-    });
+    }).catch(next);
+  }).catch(next);
+});
+
+router.get("/:id(\\d+)/", function(req, res, next){
+  req.params.id = parseInt(req.params.id);
+
+  var attributes = [
+    "name",
+    "lat",
+    "lng",
+    "spots",
+    "image_data",
+    "spot_data"
+  ];
+
+  models.Lot.findOne({where: {id:req.params.id}, attributes: attributes}).then(function(lot){
+    if(!lot)
+      return next(new error.BadRequest("No lot with id: " + req.params.id));
+
+    lot.UserId = null;
+    res.status(200);
+    res.json({status:"200", result:lot});
+  }).catch(next);
+});
+
+router.post("/", function(req, res, next){
+  var data = req.body;
+  var valid = ajv.validate(lotSchema, data);
+  if(!valid)
+    return next(new error.BadRequest("Bad parameter: " + ajv.errorsText()));
+
+  var token_data;
+  try{
+    token_data = jwt.verify(data.token, config.secret);
+  }catch(e){
+    return next(new error.Unauthorized("Token error: " + e.message));
+  }
+
+  var attributes = {
+    name: data.name,
+    lat: parseFloat(data.lat),
+    lng: parseFloat(data.lng),
+    spots: data.spots,
+    image_data: data.image_data,
+    lot_data: data.lot_data,
+    spot_data: data.spot_data,
+    UserId: token_data.userid
+  }
+
+  models.Lot.findOrCreate({where:{UserId: token_data.userid}, defaults: attributes})
+  .spread(function(lot, created){
+    if(created){
+      res.status(201);
+      res.json({status:"201", result:"Lot created.", id:lot.id});
+    }else{
+      lot.update(attributes).then(function(){
+        res.status(200);
+        res.json({status:"200", result:"Lot updated.", id:lot.id});
+      }).catch(next);
+    }
   }).catch(next);
 });
 

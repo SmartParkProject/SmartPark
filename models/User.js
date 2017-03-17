@@ -8,6 +8,7 @@ module.exports = function(sequelize, DataTypes) {
       associate: function(models) {
         User.hasOne(models.Transaction);
         User.hasMany(models.Infraction);
+        User.hasMany(models.Lot);
       }
     }
   });

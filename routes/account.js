@@ -87,4 +87,23 @@ router.post("/checktoken", function(req, res, next){
   res.json({status:200, result:"Token is valid."});
 });
 
+router.post("/lots", function(req, res, next){
+  var data = req.body;
+  var token_data;
+  try{
+    token_data = jwt.verify(data.token, config.secret);
+  }catch(e){
+    return next(new error.Unauthorized("Token error: " + e.message));
+  }
+
+  models.Lot.findAll({where:{UserId: token_data.userid}})
+  .then(function(lots){
+    if(lots.length != 0){
+      res.json({status:"200", result:lots});
+    }else{
+      return next(new error.NotFound("No lots for user"));
+    }
+  }).catch(next);
+});
+
 module.exports = router;
