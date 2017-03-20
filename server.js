@@ -1,6 +1,7 @@
 var express = require("express"),
     bodyParser = require("body-parser"),
     fs = require("fs"),
+    path = require("path"),
     https = require("https"),
     http = require("http");
 
@@ -31,6 +32,7 @@ app.all('/api/*', function(req, res, next) {
   res.header("Access-Control-Allow-Headers", "X-Requested-With, Content-Type");
   next();
 });
+app.use(express.static(path.join(__dirname, 'public')));
 
 //Routes
 var api = express.Router();
