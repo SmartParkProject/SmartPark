@@ -79,7 +79,6 @@ router.get("/:id(\\d+)/", function(req, res, next){
     if(!lot)
       return next(new error.BadRequest("No lot with id: " + req.params.id));
 
-    lot.UserId = null;
     res.status(200);
     res.json({status:"200", result:lot});
   }).catch(next);

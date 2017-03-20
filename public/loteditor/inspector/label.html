@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="inspector.js"></script>
+	<script>
+    window.onload = function(){
+      var i = new Inspector(parent.inspecting, document.getElementById("inspector"));
+      i.addAccessor(new ValueSetter("text", function(val){
+        parent.inspecting.setText(val);
+      }, "Text"));
+      i.addAccessor(new ValueSetter("rotation", function(val){
+        val = parseInt(val, 10);
+        if(isNaN(val)) return;
+        parent.inspecting.rotation = val;
+      }, "Rotation"));
+      i.addAccessor(new ValueSetter("size", function(val){
+        val = parseInt(val, 10);
+        if(isNaN(val) || val <= 0) return;
+        parent.inspecting.setSize(val);
+      }, "Size"));
+      i.addAccessor(new Button("delete", function(){
+        parent.inspecting.parent.removeChild(parent.inspecting);
+        parent.deselectAll();
+      }, "Delete Object"));
+      i.build();
+    }
+	</script>
+	<link rel="stylesheet" href="inspector.css">
+</head>
+<body>
+	<div id="title">Label</div>
+  <div id="subtitle"></div>
+  <div id="inspector"></div>
+</body>
+</html>
