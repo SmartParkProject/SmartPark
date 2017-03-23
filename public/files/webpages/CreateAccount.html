@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+    <meta name="description" content="">
+    <meta name="author" content="">
+   
+    <title>Tell Us about yourself...</title>
+    <script type="text/javascript" src="scripts/postNewInfo.js"></script>
+    <!-- Custom styles for this template -->
+    <link href="css/smartpark.css" rel="stylesheet">
+
+</head>
+
+<body>
+<div class="navbar navbar-default navbar-fixed-top">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+			<span class="sr-only">Toggle Navigation</span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href='/'>Parking Smarter</a>
+		</div>
+		<div class="navbar-collapse collapse">
+		<ul class="nav navbar-nav">
+			<li><a href= "/">Home</a></li>
+			<li><a href="/about">About</a></li>
+			<li><a href="/viewParkingMap">View Parking Maps</a></li>
+			<li><a href="/viewParkingSpots">View Parking Stats</a></li>
+		</ul>
+		</div>
+</div>
+</div><!--NavBarfor most webpages-->
+<div class="jumbotron">
+<div class= "container">
+	<form>
+	<h2 class="form-heading">Tell us a little about yourself</h2>
+	<div class="form-group">
+		<label for="fname">First Name</label>
+		<input type="text" class="form-control" id="fname" placeholder="First Name"  autofocus>
+	</div>
+	<div class="form-group">
+		<label for="lname">Last Name</label>
+		<input type="text" class="form-control" id="lname" placeholder="Last Name" autofocus>
+	</div>
+	<div class="form-group">
+		<label for="email">Email Address*</label>
+		<input type="text" class="form-control" id="email" placeholder="Email Address" required autofocus>
+	</div>
+	<div class="form-group">
+		<label for="username">UserName</label>
+		<input type="text" class="form-control" id="username" placeholder="Username" autofocus>
+	</div>
+	<div class="form-group">
+		<label for="password">Password*</label>
+		<input type="password" class="form-control" id="password" placeholder="Password" required autofocus>
+	</div>
+	<div class="form-group">
+		<label for="cpassword">Password Confirmation*</label>
+		<input type="password" class="form-control" id="cpassword" placeholder="Confirm your password" required autofocus>
+	</div>
+		<h6>* - Indicates Required Field</h6>
+		<button type="button" onclick="postNewInfo()" class="btn btn-success">Create Account</button>
+	</div>
+	</form>
+</div><!--Container-->
+</div><!--Jumbo-->
+<div id="failureModal" class="modal fade" role="dialog" data-keyboard="false" data-backdrop='static'>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<p>Required Information  already taken</p>
+				<h3 class="modal-title">Woops!</h3>			
+			</div>
+			<div class="modal-body">
+				<p>Please Click either "login" or "create account"
+				to be redirected to where you need to go</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal" onClick="location.reload('true')">Close</button><!--Relocate to .js-->
+			</div>
+		</div>
+	</div>
+</div><!--FailureModal div-->
+<div id="badpassmodal" class="modal fade" role="dialog"data-keyboard="false" data-backdrop='static'>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<p>Passwords do not match!</p>
+				<h3 class="modal-title">Woops!</h3>			
+			</div>
+			<div class="modal-body">
+				<p>Please reenter your information and try again!</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal" onClick="location.reload('true')">Close</button><!--Relocate to .js-->
+			</div>
+		</div>
+	</div>
+</div><!--badpassmodal div-->
+<!--Fixed Footer for all webpages-->
+<div class="navbar navbar-default navbar-fixed-bottom">
+	<div class="containter">
+		<div class="navbar-text pull-left">
+		<p>Parking Smarter 2017.</p>
+		</div>
+	</div>
+</div>
+   <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="bootstrap.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</body>
+</html>
