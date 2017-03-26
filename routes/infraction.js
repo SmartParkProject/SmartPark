@@ -4,6 +4,7 @@ var express = require("express"),
 
 var config = require("../config"),
     error = require("../utilities/error"),
+    auth = require("../utilities/authenticator"),
     models = require("../models");
 
 var ajv = new Ajv();
@@ -33,26 +34,21 @@ var authSchema = {
 
 var router = express.Router();
 
-router.post("/", function(req, res, next){
+router.post("/", auth, function(req, res, next){
   var data = req.body;
   var valid = ajv.validate(infractionSchema, data);
   if(!valid)
     return next(new error.BadRequest("Bad parameter: " + ajv.errorsText()));
 
-  var token_data;
-  try{
-    token_data = jwt.verify(data.token, config.secret);
-  }catch(e){
-    return next(new error.Unauthorized("Token error: " + e.message));
-  }
-
   //TODO: preprocess images to save space
-  models.Infraction.create({description: data.description, image_data: data.image, UserId: token_data.userid}).then(function(infraction){
+  models.Infraction.create({description: data.description, image_data: data.image, UserId: req.token_data.userid}).then(function(infraction){
     res.status(201);
     res.json({status:"201", result:"Infraction submitted successfully.", id:infraction.id});
   });
 });
 
+//This post method isn't totally restful and actually gets an infraction.
+//For future projects, it would be better to have clients include the token in request headers.
 router.post("/:id(\\d+)/", function(req, res, next){
   req.params.id = parseInt(req.params.id);
   var data = req.body;
@@ -60,13 +56,7 @@ router.post("/:id(\\d+)/", function(req, res, next){
   if(!valid)
     return next(new error.BadRequest("Bad parameter: " + ajv.errorsText()));
 
-  var token_data;
-  try{
-    token_data = jwt.verify(data.token, config.secret);
-  }catch(e){
-    return next(new error.Unauthorized("Token error: " + e.message));
-  }
-  //TODO: check user rights token_data.userid
+  //TODO: check user rights req.token_data.userid
   models.Infraction.findOne({where: {id:req.params.id}}).then(function(infraction){
     res.status(200);
     res.json({status:"200", result:infraction});

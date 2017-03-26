@@ -3,24 +3,18 @@ var express = require("express"),
 
 var config = require("../config"),
     error = require("../utilities/error"),
+    auth = require("../utilities/authenticator"),
     models = require("../models");
 
 var router = express.Router();
 
-router.post("/checkout",function(req, res, next){
+router.post("/checkout", auth, function(req, res, next){
   var data = req.body;
   if(!data.token)
     return next(new error.BadRequest("No token provided."));
 
-  var token_data;
-  try{
-    token_data = jwt.verify(data.token, config.secret);
-  }catch(e){
-    return next(new error.Unauthorized("Token error: " + e.message));
-  }
-
   //TODO: This is temporary. The transaction should be moved to cold storage, not deleted.
-  models.Transaction.destroy({where: {UserId: token_data.userid}}).then(function(rows){
+  models.Transaction.destroy({where: {UserId: req.token_data.userid}}).then(function(rows){
     if(rows == 0)
       throw new error.NotFound("No transactions for user.");
 

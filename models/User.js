@@ -1,8 +1,21 @@
 module.exports = function(sequelize, DataTypes) {
   var User = sequelize.define("User", {
-    username: DataTypes.STRING,
-    password: DataTypes.STRING,
-    salt: DataTypes.STRING
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    salt: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    token_salt: {
+      type: DataTypes.STRING,
+      allowNull: false
+    }
   }, {
     classMethods: {
       associate: function(models) {
