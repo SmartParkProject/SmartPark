@@ -5,6 +5,7 @@ var express = require("express"),
 
 var config = require("../config"),
     error = require("../utilities/error"),
+    auth = require("../utilities/authenticator"),
     models = require("../models");
 
 var ajv = new Ajv();
@@ -46,8 +47,8 @@ router.post("/login", function(req, res, next){
     //Also: consider adjusting expiration timer. Spec: https://tools.ietf.org/id/draft-ietf-oauth-jwt-bearer-05.html
     var key = crypto.pbkdf2Sync(data.password, user.salt, 100000, 64, "sha512");
     if(key.toString("hex") == user.password){ //We have a match.
-      var token = jwt.sign({userid:user.id}, config.secret, {expiresIn:"30d"});
-      res.json({status:200, result:token});
+      var token = jwt.sign({userid:user.id, salt:user.token_salt}, config.secret, {expiresIn:"30d"});
+      res.status(200).json({status:200, result:token});
     }else{
       throw new error.Unauthorized("Incorrect username or password.");
     }
@@ -64,39 +65,34 @@ router.post("/register", function(req, res, next){
     if(user)
       throw new error.Conflict("Account already exists with username: " + data.username);
 
-    salt = crypto.randomBytes(16).toString("hex");
-    key = crypto.pbkdf2Sync(data.password, salt, 100000, 64, "sha512").toString("hex");
-    models.User.create({username: data.username, password: key, salt: salt}).then(function(){
-      res.status(201);
-      res.json({status:201, result:"Successfully created account."});
+    var salt = crypto.randomBytes(16).toString("hex");
+    var token_salt = crypto.randomBytes(16).toString("hex");
+    var key = crypto.pbkdf2Sync(data.password, salt, 100000, 64, "sha512").toString("hex");
+    models.User.create({username: data.username, password: key, salt: salt, token_salt: token_salt}).then(function(){
+      res.status(201).json({status:201, result:"Successfully created account."});
     });
   }).catch(next);
 });
 
-router.post("/checktoken", function(req, res, next){
-  var data = req.body;
-  if(!data.token)
-    return next(new error.BadRequest("No token provided."));
-
-  try{
-    jwt.verify(data.token, config.secret);
-  }catch(e){
-    return next(new error.BadRequest("Token error: " + e.message));
-  }
-  res.status(200);
-  res.json({status:200, result:"Token is valid."});
+router.post("/logout", auth, function(req, res, next){
+  models.User.findOne({where: {id: req.token_data.userid}}).then(function(user){
+    //This technically doesn't guarantee invalidation. It may be better to store
+    //an integer to be incremented on logout.
+    var token_salt = crypto.randomBytes(16).toString("hex");
+    user.update({token_salt: token_salt}).then(function(){
+      res.status(200).json({status:200, result:"Invalidated existing tokens."});
+    });
+  }).catch(next);
 });
 
-router.post("/lots", function(req, res, next){
-  var data = req.body;
-  var token_data;
-  try{
-    token_data = jwt.verify(data.token, config.secret);
-  }catch(e){
-    return next(new error.Unauthorized("Token error: " + e.message));
-  }
+router.post("/checktoken", auth, function(req, res, next){
+  res.status(200).json({status:200, result:"Token is valid."});
+});
 
-  models.Lot.findAll({where:{UserId: token_data.userid}})
+router.post("/lots", auth, function(req, res, next){
+  var data = req.body;
+
+  models.Lot.findAll({where:{UserId: req.token_data.userid}})
   .then(function(lots){
     if(lots.length != 0){
       res.json({status:"200", result:lots});

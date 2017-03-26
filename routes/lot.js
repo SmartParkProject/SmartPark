@@ -4,6 +4,7 @@ var express = require("express"),
 
 var config = require("../config"),
     error = require("../utilities/error"),
+    auth = require("../utilities/authenticator"),
     models = require("../models");
 
 var ajv = new Ajv();
@@ -84,18 +85,11 @@ router.get("/:id(\\d+)/", function(req, res, next){
   }).catch(next);
 });
 
-router.post("/", function(req, res, next){
+router.post("/", auth, function(req, res, next){
   var data = req.body;
   var valid = ajv.validate(lotSchema, data);
   if(!valid)
     return next(new error.BadRequest("Bad parameter: " + ajv.errorsText()));
-
-  var token_data;
-  try{
-    token_data = jwt.verify(data.token, config.secret);
-  }catch(e){
-    return next(new error.Unauthorized("Token error: " + e.message));
-  }
 
   var attributes = {
     name: data.name,
@@ -105,10 +99,10 @@ router.post("/", function(req, res, next){
     image_data: data.image_data,
     lot_data: data.lot_data,
     spot_data: data.spot_data,
-    UserId: token_data.userid
+    UserId: req.token_data.userid
   }
 
-  models.Lot.findOrCreate({where:{UserId: token_data.userid}, defaults: attributes})
+  models.Lot.findOrCreate({where:{UserId: req.token_data.userid}, defaults: attributes})
   .spread(function(lot, created){
     if(created){
       res.status(201);
