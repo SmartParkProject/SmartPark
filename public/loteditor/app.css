@@ -2,7 +2,14 @@ iframe{
 	border-style:solid;
 	border-width:1px;
 }
-#canvas{
+#title{
+  border: 1px solid;
+  font-family: sans-serif;
+  font-size: 5vh;
+  font-weight: bold;
+  text-align: center;
+  height: 5vh;
+  overflow:hidden;
 }
 #canvas-container{
   border: 1px solid;
@@ -24,7 +31,7 @@ iframe{
 }
 #properties{
   display: block;
-  height: 30vh;
+  height: 25vh;
 }
 *{
   margin: 0;
