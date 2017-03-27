@@ -21,7 +21,7 @@ function verifier(req, res, next){
   models.User.findOne({where: {id:token_data.userid}}).then(function(user){
     if(user){
       if(token_data.salt != user.token_salt){
-        next(new error.Unauthorized("Token is invalid."))
+        next(new error.Unauthorized("Token is invalid."));
       }else{
         next();
       }

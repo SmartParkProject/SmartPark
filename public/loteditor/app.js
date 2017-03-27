@@ -27,14 +27,12 @@ window.onload = function(){
 
   root = new Entity(0, 0);
   root.selectable = false;
-  root.addChild(new Spot(500, 200, 135));
-  root.addChild(new SpotGroup(500, 400, 3));
-  root.children[1].rotation = 45;
 
   setScale(0.5);
   setMinimumScale(0.25);
 
-  tick();
+  load();
+  //tick();
 }
 
 function setScale(scale){
@@ -408,12 +406,12 @@ function getImage(){
   return output.toDataURL().split("data:image/png;base64,").join("");
 }
 
-var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOjEsImlhdCI6MTQ4OTc5Mjk3OCwiZXhwIjoxNDkyMzg0OTc4fQ.J_3KlxsJRTsojG94wj4G3ZiKJg6fU5eJCqdl9M-BJJI";
-function save(){
+function save(properties){
+  var token = getCookie("token");
   var data = {
-    name: "Test",
-    lat: "43.0",
-    lng: "82.0",
+    name: properties.name,
+    lat: properties.lat,
+    lng: properties.lng,
     spots: countSpots(),
     image_data: getImage(),
     lot_data: serialize(root),
@@ -424,16 +422,45 @@ function save(){
     console.log(response);
   });
 }
-
 function load(){
+  var token = getCookie("token");
+  if(!token){
+    alert("Not logged in.");
+    //TODO: prompt for log in.
+    return;
+  }
   var data = {
     token:token
   }
   sendJSON("POST", "https://192.168.0.4/api/account/lots", data, function(response){
     if(response.result){
+      document.getElementById("properties").contentWindow.set(response.result[0]);
       root = deserialize(response.result[0].lot_data);
     }
+    tick();
+  }, function(response){
+    if(response.status == 401){
+      alert("Bad token.");
+    }else{
+      tick();
+    }
   });
+}
+//http://stackoverflow.com/a/38699214/2705137
+const setCookie = (name, value, days = 7, path = '/') => {
+  const expires = new Date(Date.now() + days * 864e5).toGMTString()
+  document.cookie = name + `=${encodeURIComponent(value)}; expires=${expires}; path=` + path
+}
+
+const getCookie = (name) => {
+  return document.cookie.split('; ').reduce((r, v) => {
+    const parts = v.split('=')
+    return parts[0] === name ? decodeURIComponent(parts[1]) : r
+  }, '')
+}
+
+const deleteCookie = (name, path) => {
+  setCookie(name, '', -1, path)
 }
 
 function sendJSON(method, url, data, callback, error){
