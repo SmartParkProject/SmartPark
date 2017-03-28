@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+    <meta name="description" content="">
+    <meta name="author" content="">
+   
+    <title>Smart Park - Parking, just Smarter!</title>
+
+    <!-- Custom styles for this template -->
+    <link href="smartpark.css" rel="stylesheet">
+    <script src="authuser.js"></script>
+    <script src="logout.js"></script>
+	<script src="getStatus.js"></script>
+	<script src="checkin.js"></script>
+</head>
+<body onload="AuthUser()">
+<div class="navbar navbar-default navbar-fixed-top">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+			<span class="sr-only">Toggle Navigation</span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href='/'>Parking Smarter</a>
+		</div><!--Header-->
+		<div class="navbar-collapse collapse">
+		<ul class="nav navbar-nav">
+			<li><a href= "/">Home</a></li>
+			<li><a href="/about">About</a></li>
+			<li><a href="/viewParkingMap">View Parking Maps</a></li>
+			<li><a href="/viewParkingSpots">View Parking Stats</a></li>
+		</ul>
+		<div class="container-fluid">
+		<form class="navbar-form navbar-right">
+		<a class="btn btn-success" onclick="display_warning()" role="button">Log Out</a>
+		</form>
+		</div>
+		</div><!--collapse-->
+	</div><!--container-fluid-->
+</div><!--navfixed top-->
+<div class="container-fluid" id= "accountmancontainer" style="padding-top:50px">
+	<div class="row">
+	<div class="col-xs-12 col-sm-12 col-lg-12"><h3 class="page-header"> Hello! Welcome to your Smart Park account!</h3></div>
+	</div>
+	<div class="row">
+		<div class="col-sm-12">
+			<ul class="nav nav-tabs">
+				<li class="active"><a type="button" data-toggle="tab" href="#overview">Overview</a></li>
+				<li><a type="button" data-toggle="tab" href="#Useracct">User Account Details</a></li>
+				<li><a type="button" data-toggle="tab" href="#parkinfo"   onClick="getStatus()">Parking Information</a></li>
+				<li><a type="button" data-toggle="tab" href="#payment">Payment Information</a></li>
+			</ul>
+		</div>
+	</div><!--Row-->
+<div class="tab-content">
+
+	<div id="overview" class="tab-pane fade in active">
+		<h2>Account Overview</h2>
+		
+	</div>
+
+	
+	<div id="Useracct" class="tab-pane fade">
+		<h2>User Account</h2>
+		<form class="form-inline" style="padding: 20px;">
+			<div class="form-group-vertical">
+				<label class="control-label">Email:</label>
+						<p class="form-control-static">you@somewhere@example.com</p>
+			</div>
+			<div class="form-group-vertical">
+				<label class="control-label">Password:</label>
+						<p class="form-control-static">Password</p>
+			</div>
+		</form>
+	</div>
+	
+		<div id="parkinfo" class="tab-pane fade">
+		<h2>User Parking Information</h2>
+		<form class="form-inline" style="padding: 20px;">
+			<div class="form-group-vertical">
+							<input type="number" class="form-control" id="lot" placeholder="Lot" required autofocus>
+							<input type="number" class="form-control" id="spot" placeholder="Spot Number" required autofocus>
+							<button type="btn btn-default" onclick="checkin()" data-toggle="tab" href="#parkinfo">Check In</button>
+							<button type="btn btn-default" onClick="checkout()" data-toggle="tab" href="#parkinfo">Check Out</button>
+			</div>
+			<div class="form-group-vertical">
+				<label class="control-label">Current Parking Status:</label>
+						<p id="currstatus" class="form-control-static"></p>
+			</div>
+			<div class="form-group-vertical">
+				<label class="control-label">Current Parking Lot:</label>
+						<p id="currlot" class="form-control-static">None</p>
+			</div>
+			<div class="form-group-vertical">
+				<label class="control-label">Spot:</label>
+						<p id="currspot" class="form-control-static">None</p>
+			</div>
+		</form>
+	</div>
+	
+		<div id="payment" class="tab-pane fade">
+		<h4>Payment Options and Information<h4>
+		<p>Somthing</p>
+	</div>
+	
+		</div><!--Tabcontent end-->
+</div><!--Dashboard container -->
+
+<div id="failureModal" class="modal fade" role="dialog" data-keyboard="false" data-backdrop='static'>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<p>Not Logged into Smart Park!</p>
+				<h3 class="modal-title">Woops!</h3>			
+			</div>
+			<div class="modal-body">
+				<p>It seems you are not logged in.</p>
+				<p>Please Click either "login" or "create account"
+				to be redirected to where you need to go</p>
+			</div>
+			<div class="modal-footer">
+				<a class="btn btn-success" href="/login" role="button">Login</a>
+				<a class="btn btn-default" href="/CreateAccount">CreateAccount</a>
+				<button type="button" class="btn btn-default" data-dismiss="modal" onClick="window.location.replace('/')">Close</button><!--Relocate to .js-->
+			</div>
+		</div>
+	</div>
+</div><!--Modal div-->
+<div id="warnModal" class="modal fade" role="dialog" data-keyboard="false" data-backdrop='static'>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 class="modal-title">Are you sure you want to leave?</h3>			
+			</div>
+			<div class="modal-body">
+			<p>You will be redirected to the login screen</p>
+			</div>
+			<div class="modal-footer">
+				<a class="btn btn-success" href="/login" onclick="crack_token()" role="button">Yes</a>
+				<button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+			</div>
+		</div>
+	</div>
+</div><!--warningModal div-->
+<!--Fixed Footer for all webpages-->
+<div class="navbar navbar-default navbar-fixed-bottom">
+	<div class="containter">
+		<div class="navbar-text pull-left">
+		<p>Parking Smarter 2017.</p>
+		</div>
+	</div>
+</div>
+   <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="bootstrap.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</body>
+</html>
