@@ -287,6 +287,8 @@ function cloneMatrix(m){
 
   return n;
 }
+//NOTE: This has unexpected behavior for multiple enhanced contexts as it modifies
+//the global context prototype to work.
 //http://stackoverflow.com/a/7397026
 //in theory, SVGMatrix will be used by the Canvas API in the future;
 //in practice, we can borrow an SVG matrix today!

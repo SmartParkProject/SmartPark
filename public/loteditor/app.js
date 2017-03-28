@@ -380,7 +380,7 @@ function serializeSpots(){
   for(var i = 0; i < entities.length; i++){
     if(entities[i].type == "Spot"){
       var pos = getTransformedPoint(entities[i].getAnchorCanvasPosition());
-      spots.push({x:pos.x, y:pos.y, id:entities[i].spotid});
+      spots.push({x:Math.round(pos.x), y:Math.round(pos.y), id:entities[i].spotid});
     }
   }
   return JSON.stringify(spots);
@@ -412,13 +412,13 @@ function save(properties){
     name: properties.name,
     lat: properties.lat,
     lng: properties.lng,
-    spots: countSpots(),
-    image_data: getImage(),
-    lot_data: serialize(root),
     spot_data: serializeSpots(),
+    spots: countSpots(),
+    lot_data: serialize(root),
+    image_data: getImage(), //NOTE: This should be done last due to limitations of enhanceContext
     token: token
   }
-  sendJSON("POST", "https://192.168.0.4/api/lot", data, function(response){
+  sendJSON("POST", "/api/lot", data, function(response){
     console.log(response);
   });
 }
@@ -432,7 +432,7 @@ function load(){
   var data = {
     token:token
   }
-  sendJSON("POST", "https://192.168.0.4/api/account/lots", data, function(response){
+  sendJSON("POST", "/api/account/lots", data, function(response){
     if(response.result){
       document.getElementById("properties").contentWindow.set(response.result[0]);
       root = deserialize(response.result[0].lot_data);
@@ -472,7 +472,7 @@ function sendJSON(method, url, data, callback, error){
     if(this.status >= 200 && this.status < 300){
       callback(JSON.parse(this.response));
     }else{
-      if(error) error(this.response);
+      if(error) error(JSON.parse(this.response));
     }
   }
   request.onerror = function(){
