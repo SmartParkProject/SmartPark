@@ -7,7 +7,7 @@ function postInfo(){
 	data: JSON.stringify({username: $('#usernamein').val(), password: $('#password').val()}),
 	success: function (data) {
 		console.log(data);
-		document.cookie = "token="+data.result;
+		document.cookie = "token="+data.result+";path=/";
 		window.location.replace("/accountman");
 	},
 	error: function (data) {
