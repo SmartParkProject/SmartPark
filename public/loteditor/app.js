@@ -380,7 +380,7 @@ function serializeSpots(){
   for(var i = 0; i < entities.length; i++){
     if(entities[i].type == "Spot"){
       var pos = getTransformedPoint(entities[i].getAnchorCanvasPosition());
-      spots.push({x:pos.x, y:pos.y, id:entities[i].spotid});
+      spots.push({x:Math.round(pos.x), y:Math.round(pos.y), id:entities[i].spotid});
     }
   }
   return JSON.stringify(spots);
@@ -412,10 +412,10 @@ function save(properties){
     name: properties.name,
     lat: properties.lat,
     lng: properties.lng,
-    spots: countSpots(),
-    image_data: getImage(),
-    lot_data: serialize(root),
     spot_data: serializeSpots(),
+    spots: countSpots(),
+    lot_data: serialize(root),
+    image_data: getImage(), //NOTE: This should be done last due to limitations of enhanceContext
     token: token
   }
   sendJSON("POST", "/api/lot", data, function(response){

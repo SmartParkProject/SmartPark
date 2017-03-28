@@ -6,7 +6,7 @@ window.onload = function(){
     properties.lng = parseFloat(document.getElementById("lng").value);
     if(isNaN(properties.lat) || isNaN(properties.lng))
       return alert("invalid latitude or longitude");
-    parent.save(properties);
+    parent.save.apply(parent, properties);
   }
 }
 
