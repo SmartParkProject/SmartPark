@@ -418,7 +418,7 @@ function save(properties){
     spot_data: serializeSpots(),
     token: token
   }
-  sendJSON("POST", "https://192.168.0.4/api/lot", data, function(response){
+  sendJSON("POST", "/api/lot", data, function(response){
     console.log(response);
   });
 }
@@ -432,7 +432,7 @@ function load(){
   var data = {
     token:token
   }
-  sendJSON("POST", "https://192.168.0.4/api/account/lots", data, function(response){
+  sendJSON("POST", "/api/account/lots", data, function(response){
     if(response.result){
       document.getElementById("properties").contentWindow.set(response.result[0]);
       root = deserialize(response.result[0].lot_data);
@@ -472,7 +472,7 @@ function sendJSON(method, url, data, callback, error){
     if(this.status >= 200 && this.status < 300){
       callback(JSON.parse(this.response));
     }else{
-      if(error) error(this.response);
+      if(error) error(JSON.parse(this.response));
     }
   }
   request.onerror = function(){
