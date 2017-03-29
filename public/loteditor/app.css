@@ -2,14 +2,19 @@ iframe{
 	border-style:solid;
 	border-width:1px;
 }
+#error{
+  text-align: center;
+  font-family: sans-serif;
+}
 #title{
   border: 1px solid;
   font-family: sans-serif;
-  font-size: 5vh;
+  font-size: 50px;
   font-weight: bold;
   text-align: center;
-  height: 5vh;
-  overflow:hidden;
+  min-height: 50px;
+  max-height: 50px;
+  overflow: hidden;
 }
 #canvas-container{
   border: 1px solid;
@@ -23,20 +28,22 @@ iframe{
 }
 #app{
   display: flex;
-  flex-direction: column;
 }
-.row{
-  display: flex;
-  height: 70vh; /*Apparently the only way to force scrollable content in a flexbox is to manually set the content's size.*/
+.hidden{
+  display: none;
 }
 #properties{
   display: block;
-  height: 25vh;
+  min-height: 300px;
+  max-height: 300px;
 }
 *{
   margin: 0;
 }
 body{
   user-select: none;
-  overflow:hidden;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
 }

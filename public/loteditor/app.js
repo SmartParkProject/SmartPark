@@ -406,7 +406,7 @@ function getImage(){
   return output.toDataURL().split("data:image/png;base64,").join("");
 }
 
-function save(properties){
+function save(properties, callback){
   var token = getCookie("token");
   var data = {
     name: properties.name,
@@ -419,13 +419,13 @@ function save(properties){
     token: token
   }
   sendJSON("POST", "/api/lot", data, function(response){
-    console.log(response);
+    callback();
   });
 }
 function load(){
   var token = getCookie("token");
   if(!token){
-    alert("Not logged in.");
+    exitWithMessage("Not logged in.");
     //TODO: prompt for log in.
     return;
   }
@@ -440,11 +440,17 @@ function load(){
     tick();
   }, function(response){
     if(response.status == 401){
-      alert("Bad token.");
+      exitWithMessage(response.message);
     }else{
       tick();
     }
   });
+}
+function exitWithMessage(message){
+  document.body.removeChild(document.getElementById("app"));
+  document.body.removeChild(document.getElementById("properties"));
+  document.getElementById("error").className = "";
+  document.getElementById("errorMessage").innerHTML = message;
 }
 //http://stackoverflow.com/a/38699214/2705137
 const setCookie = (name, value, days = 7, path = '/') => {
