@@ -65,7 +65,7 @@
       var rect = parent.getAbsoluteRect(thiselem);
       var left = x-(dragging.offset.x - rect.left + (SELECTION_PADDING + 2));
       var top = y-(dragging.offset.y - rect.top + (SELECTION_PADDING + 2));
-      var style = `position: absolute; z-index:10000; left: ${left}px; top: ${top}px;`
+      var style = `position: absolute; z-index:10000; left: ${left+1}px; top: ${top+1}px;`
       dragging.elem.style = style;
     }
     dragging = {entity:clone, offset:offset, elem:elem, updateDrag:updateDrag};

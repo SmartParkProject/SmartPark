@@ -6,14 +6,21 @@
 	<link rel="stylesheet" href="app.css">
 </head>
 <body>
-  <div id="app">
-    <div id="title">SmartPark Lot editor</div>
-    <div class="row">
-      <iframe id="objectpicker" src="prototypes.html">Toolbar</iframe>
-    	<div id="canvas-container"><canvas id="canvas"></canvas></div>
-    	<iframe id="inspector" src="inspector/default.html">Inspector</iframe>
-    </div>
-    <iframe id="properties" src="properties.html">Properties</iframe>
+  <div id="title">SmartPark Lot editor</div>
+  <div id="error" class="hidden">
+    <br>
+    <h1>Error:</h1>
+    <br>
+    <div id="errorMessage"></div>
+    <br>
+    <a href="/login">Login</a>
+    <a href="/">Return to home</a>
   </div>
+  <div id="app">
+    <iframe id="objectpicker" src="prototypes.html">Toolbar</iframe>
+  	<div id="canvas-container"><canvas id="canvas"></canvas></div>
+  	<iframe id="inspector" src="inspector/default.html">Inspector</iframe>
+  </div>
+  <iframe id="properties" src="properties.html">Properties</iframe>
 </body>
 </html>
