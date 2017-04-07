@@ -1,7 +1,9 @@
-function AuthUser(){
-	cookies = document.cookie;
+function AuthUser(){	
+	var cookies = document.cookie;
 	console.log(cookies);
-	token = cookies.substr(6, cookies.length);
+	var token = cookies.substr(6, cookies.length);
+	console.log(token);
+
 		$.ajax({
 	type: "POST",
 	url: "https://smartparkproject.tk/api/account/checktoken",

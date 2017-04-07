@@ -12,6 +12,7 @@
     <title>Smart Park - Parking, just Smarter!</title>
     <!-- Custom styles for this template -->
     <script src="getcustmap.js"></script>
+    <script src="gmap.js"></script>
     <link href="smartpark.css" rel="stylesheet">
 </head>
 
@@ -32,34 +33,38 @@
 			<li><a href= "/">Home</a></li>
 			<li><a href="/about">About</a></li>
 			<li class="active"><a href="/viewParkingMap">View Parking Maps</a></li>
-			<li><a href="/viewParkingSpots">View Parking Stats</a></li>
 		</ul>
 		<div class="container-fluid">
 		<form class="navbar-form navbar-right">
 		<a class="btn btn-success" href="/login" role="button">Login</a>
 		<a class="btn btn-default" href="/CreateAccount">Create Account</a>
+		<a class="btn btn-default" href="/accountman">Account Management</a>
 		</form>
 		</div>
 		</div>
 </div>
 </div>
-<div class="container-fluid" style="padding-top:50px">
-<div class="row">
-	<div class="col-sm-6">
-		<h3 class = "form-signin-heading">enter location data</h3>
-		<form class="form-signin">
-			<input type="text" class="form-control" id="lat" placeholder="lat" required autofocus>
-			<input type="text" class="form-control" id="lng" placeholder="lng" required autofocus>
-			<input type="text" class="form-control" id="distance" placeholder="distance" required autofocus>
-			<button type="button" onclick="getcustMap()" class="btn btn-success">Submit</button>
-		</form>	
-	</div>
-	<div class="col-sm-6">
-	 <img id="canvas">
-		
-	</div>
-</div><!--row-->
+<div class="container" style="padding-top:75px; width:100%;height: 700px;" onload="initMap()">
+			<div id="map" style="height: 100%"></div>
 </div>
+
+<!-- modal map display -->
+<div id="mapModal" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<p>Parking Map</p>
+				<h3 class="modal-title">View Parking Map</h3>			
+			</div>
+			<div class="modal-body">
+					<img id="mapimage" style="max-height: 500px; max-width: 500px;">
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div><!--Modal div-->
 <!--Fixed Footer for all webpages-->
 <div class="navbar navbar-default navbar-fixed-bottom">
 	<div class="containter">
@@ -75,5 +80,7 @@
     <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
     
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCTsXJx0NY_foa6AYBzQjSgQOq3YSVnQgE&callback=initMap"
+    async defer></script>
 </body>
 </html>
