@@ -54,7 +54,8 @@
 			<ul class="nav nav-tabs">
 				<li class="active"><a type="button" data-toggle="tab" href="#overview">Overview</a></li>
 				<li><a type="button" data-toggle="tab" href="#Useracct">User Account Details</a></li>
-				<li><a type="button" data-toggle="tab" href="#parkinfo"   onClick="getStatus()">Parking Information</a></li>
+				<li><a type="button" data-toggle="tab" href="#parkinfo">Parking Information</a></li>
+				<li><a type="button" data-toggle="tab" href="#reservations">Reservations</a></li>
 				<li><a type="button" data-toggle="tab" href="#payment">Payment Information</a></li>
 			</ul>
 		</div>
@@ -63,7 +64,16 @@
 
 	<div id="overview" class="tab-pane fade in active">
 		<h2>Account Overview</h2>
-		
+		<form class="form-inline" style="padding: 20px;">
+		<div class="form-group-vertical">
+				<label class="control-label">Current Parking Status:</label>
+						<p id="overviewParkStat" class="form-control-static"></p>
+		</div>
+		<div class="form-group-vertical">
+				<label class="control-label">Current Amount Due:</label>
+						<p id="OverviewCurrAMTdue" class="form-control-static"></p>
+		</div>
+		</form>
 	</div>
 
 	
@@ -72,7 +82,7 @@
 		<form class="form-inline" style="padding: 20px;">
 			<div class="form-group-vertical">
 				<label class="control-label">Email:</label>
-						<p class="form-control-static">you@somewhere@example.com</p>
+						<p class="form-control-static">youSomewhere@example.com</p>
 			</div>
 			<div class="form-group-vertical">
 				<label class="control-label">Password:</label>
@@ -81,28 +91,39 @@
 		</form>
 	</div>
 	
-		<div id="parkinfo" class="tab-pane fade">
+		<div id="parkinfo" class="tab-pane fade" data-toggle="validator">
 		<h2>User Parking Information</h2>
-		<form class="form-inline" style="padding: 20px;">
-			<div class="form-group-vertical">
-							<input type="number" class="form-control" id="lot" placeholder="Lot" required autofocus>
-							<input type="number" class="form-control" id="spot" placeholder="Spot Number" required autofocus>
-							<button type="btn btn-default" onclick="checkin()" data-toggle="tab" href="#parkinfo">Check In</button>
-							<button type="btn btn-default" onClick="checkout()" data-toggle="tab" href="#parkinfo">Check Out</button>
-			</div>
-			<div class="form-group-vertical">
-				<label class="control-label">Current Parking Status:</label>
-						<p id="currstatus" class="form-control-static"></p>
-			</div>
-			<div class="form-group-vertical">
-				<label class="control-label">Current Parking Lot:</label>
-						<p id="currlot" class="form-control-static">None</p>
-			</div>
-			<div class="form-group-vertical">
-				<label class="control-label">Spot:</label>
-						<p id="currspot" class="form-control-static">None</p>
-			</div>
-		</form>
+			<form class="form-inline" style="padding: 20px;">
+				<div class="form-group-vertical">
+								<p>*Options Listed are based on Geolocation</p>
+								<select class="form-control" id="lot" onchange="report(this.value)">
+									<option>Please select a parking lot</option>
+								</select>
+								<select class="form-control" id="spot">
+									<option>Please Select Spot</option>
+								</select>
+								<button class="btn btn-success" onClick="checkin()" data-toggle="tab" href="#parkinfo">Check In</button>
+								<button class="btn btn-default"  onClick="checkout()" data-toggle="tab" href="#parkinfo">Check Out</button>
+				</div>
+				<div class="form-group-vertical">
+					<label class="control-label">Current Parking Status:</label>
+							<p id="currstatus" class="form-control-static"></p>
+				</div>
+				<div class="form-group-vertical">
+					<label class="control-label">Current Parking Lot:</label>
+							<p id="currlot" class="form-control-static">None</p>
+				</div>
+				<div class="form-group-vertical">
+					<label class="control-label">Spot:</label>
+							<p id="currspot" class="form-control-static">None</p>
+				</div>
+			</form>
+	</div>
+	
+	
+	<div id="reservations" class="tab-pane fade">
+		<h2>Reservations</h2>
+		<p></p>
 	</div>
 	
 		<div id="payment" class="tab-pane fade">
@@ -133,6 +154,7 @@
 		</div>
 	</div>
 </div><!--Modal div-->
+
 <div id="warnModal" class="modal fade" role="dialog" data-keyboard="false" data-backdrop='static'>
 	<div class="modal-dialog">
 		<div class="modal-content">
@@ -149,6 +171,23 @@
 		</div>
 	</div>
 </div><!--warningModal div-->
+
+<div id="checkModal" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 id="modalTitle" class="modal-title">Parking Status</h3>			
+			</div>
+			<div class="modal-body">
+			<p id="innerModal"></p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div><!--checkinoutModal div-->
+
 <!--Fixed Footer for all webpages-->
 <div class="navbar navbar-default navbar-fixed-bottom">
 	<div class="containter">

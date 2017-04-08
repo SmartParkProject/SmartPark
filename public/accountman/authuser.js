@@ -11,6 +11,7 @@ function AuthUser(){
 	contentType:"application/json; charset=utf-8",
 	data: JSON.stringify({token: token}),
 	success: function (data) {
+		getStatus();
 	},
 	error: function (data) {
 	$("#failureModal").modal('show');
