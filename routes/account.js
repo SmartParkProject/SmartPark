@@ -92,14 +92,15 @@ router.post("/checktoken", auth, function(req, res, next){
 router.post("/lots", auth, function(req, res, next){
   var data = req.body;
 
-  models.Lot.findAll({where:{UserId: req.token_data.userid}})
-  .then(function(lots){
-    if(lots.length != 0){
-      res.json({status:"200", result:lots});
-    }else{
-      return next(new error.NotFound("No lots for user"));
-    }
-  }).catch(next);
+  models.User.findOne({where:{id:req.token_data.userid}}).then(function(user){
+    user.getLots({through: {where:{level: 0}}}).then(function(lots){
+      if(lots.length != 0){
+        res.json({status:"200", result:lots});
+      }else{
+        return next(new error.NotFound("No lots for user"));
+      }
+    });
+  });
 });
 
 module.exports = router;

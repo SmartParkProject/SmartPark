@@ -31,11 +31,14 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     classMethods: {
       associate: function(models) {
-        Lot.belongsTo(models.User, {
-          onDelete: "CASCADE",
-          foreignKey: {
-            allowNull: false
-          }
+        Lot.hasMany(models.Infraction);
+        Lot.belongsToMany(models.User, {through: models.Permission});
+      }
+    },
+    instanceMethods: {
+      checkPermissions:function(id, level){
+        return this.getUsers({where:{id:id}, through: {where:{level: {$lte: level}}}}).then(function(users){
+          return users.length == 1;
         });
       }
     }
