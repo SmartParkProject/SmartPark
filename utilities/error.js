@@ -33,3 +33,4 @@ exports.Unauthorized = errorFactory.getAPIError(401, "Missing or invalid authent
 exports.Forbidden = errorFactory.getAPIError(403, "Permissions not met for the request.");
 exports.NotFound = errorFactory.getAPIError(404, "The requested resource couldn't be found.");
 exports.Conflict = errorFactory.getAPIError(409, "There was a conflict with the request.");
+exports.Internal = errorFactory.getAPIError(500, "The server encountered an error handling the request.");

@@ -32,6 +32,7 @@ module.exports = function(sequelize, DataTypes) {
     classMethods: {
       associate: function(models) {
         Lot.hasMany(models.Infraction);
+        Lot.hasMany(models.Transaction);
         Lot.belongsToMany(models.User, {through: models.Permission});
       }
     },

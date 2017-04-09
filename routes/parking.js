@@ -41,17 +41,17 @@ router.post("/", auth, function(req, res, next){
     if(!lot)
       throw new error.BadRequest("No lot with id: " + data.lot);
 
-    if(data.lot > lot.spots)
+    if(data.spot > lot.spots)
       throw new error.BadRequest("Spot number out of bounds for lot");
 
-    models.Transaction.findAll({include: [models.User]}).then(function(transactions){
-      if(transactions.find(a => a.spot == data.spot && a.lot == data.lot))
+    lot.getTransactions({include: [models.User]}).then(function(transactions){
+      if(transactions.find(a => a.spot == data.spot))
         throw new error.Conflict("Transaction already exists for parking spot with id: " + data.spot);
 
       if(transactions.find(a => a.User.id == req.token_data.userid))
         throw new error.Conflict("Transaction already exists for user.");
 
-      models.Transaction.create({lot: data.lot, spot: data.spot, reserve_time: new Date(), UserId: req.token_data.userid}).then(function(transaction){
+      models.Transaction.create({LotId: data.lot, spot: data.spot, reserve_time: new Date(), UserId: req.token_data.userid}).then(function(transaction){
         res.status(201);
         res.json({status:"201", result:"Successfully checked-out parking spot."});
       });

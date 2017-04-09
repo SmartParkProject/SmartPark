@@ -15,7 +15,9 @@ module.exports = function(sequelize, DataTypes) {
     token_salt: {
       type: DataTypes.STRING,
       allowNull: false
-    }
+    },
+    firstname: DataTypes.STRING,
+    lastname: DataTypes.STRING
   }, {
     classMethods: {
       associate: function(models) {

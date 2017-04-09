@@ -51,11 +51,14 @@ router.get("/:id(\\d+)/available", function(req, res, next){
     if(!lot)
       return next(new error.BadRequest("No lot with id: " + req.params.id));
 
+    if(lot.spots < 1)
+      return next(new error.Internal("Requested lot is missing spot definition."));
+
     var converted_array = new Array(lot.spots);
     for(var i = 0; i < lot.spots; i++){
       converted_array[i] = 1;
     }
-    models.Transaction.findAll({where: {lot:req.params.id}}).then(function(transactions){
+    lot.getTransactions().then(function(transactions){
       for(var item in transactions){
         converted_array[transactions[item].spot] = 0;
       }
