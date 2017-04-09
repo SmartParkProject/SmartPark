@@ -45,7 +45,7 @@ $.ajax({
 		for(var i = 0; i < stringin.length; i++){
 			ctx.fillStyle = "green";
 			ctx.beginPath();
-			ctx.ellipse(x_array[i], y_array[i], 30, 30, 45*Math.PI/180, Math.PI, 2 * Math.PI);
+			ctx.ellipse(x_array[i], y_array[i], 5, 5, 0, 0, 2 * Math.PI);
 			ctx.fill();
 		}
 		var image_out = mycanvas.toDataURL();
@@ -56,4 +56,3 @@ $.ajax({
 	}
 });
 }
-

@@ -1,7 +1,7 @@
 function checkin(){
 	cookies = document.cookie;
 	token = cookies.substr(6, cookies.length);
-	
+	console.log($('#lot').val());
 $.ajax({
 	type: "POST",
 	url: "https://smartparkproject.tk/api/parking/",
@@ -13,10 +13,16 @@ $.ajax({
 		$('#currlot').text($('#lot').val());
 		$('#currspot').text($('#spot').val());
 		$('#currstatus').text("Checked In");
+		$('#modalTitle').text("Parking Status: Success!");
+		$('#innerModal').text("Checked into Lot "+$('#lot').val()+" and spot "+$('#spot').val()+".");
+		$('#checkModal').modal("show");
 		
 	},
 	error: function (data) {
 		console.log(data);
+		$('#modalTitle').text("Parking Status: Failure");
+		$('#innerModal').text("You may have already been checked into another parking spot, or the spot is no longer available. Please review your options and try again.");
+		$('#checkModal').modal("show");
 	}
 });
 }
@@ -35,9 +41,15 @@ $.ajax({
 		$('#currlot').text("None");
 		$('#currspot').text("None");
 		$('#currstatus').text("Not Currently Checked In");
+		$('#modalTitle').text("Parking Status: Successfully Checked out!");
+		$('#innerModal').text("You are no longer parked into the spot. Thank you");
+		$('#checkModal').modal("show");
 	},
 	error: function (data) {
 		console.log(data);
+		$('#modalTitle').text("Parking Status: Error");
+		$('#innerModal').text("You are not checked into a parking spot. Unable to complete your request. Please Review your options and try again.");
+		$('#checkModal').modal("show");
 	}
 });
 }
