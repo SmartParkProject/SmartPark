@@ -17,7 +17,6 @@ module.exports = function(sequelize, DataTypes) {
         Infraction.belongsTo(models.Lot, {
           onDelete: "CASCADE",
           foreignKey: {
-            name: "id",
             allowNull: false
           }
         });
