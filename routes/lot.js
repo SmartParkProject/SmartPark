@@ -70,17 +70,37 @@ router.get("/:id(\\d+)/available", function(req, res, next){
 router.post("/:id(\\d+)/infractions", auth, function(req, res, next){
   req.params.id = parseInt(req.params.id);
 
-  models.Lot.findOne({where: {id:req.params.id}}).then(function(lot){
-    if(!lot)
-      return next(new error.BadRequest("No lot with id: " + req.params.id));
+  models.Lot.getIfAuthorized(req.params.id, req.token_data.userid, 1).then(function(lot){
+    lot.getInfractions().then(function(infractions){
+      if(infractions.length < 1) return next(new error.NotFound("No infractions for lot."));
+      res.json({status:200, result:infractions});
+    });
+  }).catch(next);
+});
 
-    lot.checkPermissions(req.token_data.userid, 1).then(function(authorized){
-      if(!authorized)
-        return next(new error.Forbidden("User does not have permissions for lot."));
+router.post("/:id(\\d+)/events", auth, function(req, res, next){
+  req.params.id = parseInt(req.params.id);
 
-      lot.getInfractions().then(function(infractions){
-        if(infractions.length < 1) return next(new error.NotFound("No infractions for lot."));
-        res.json({status:200, result:infractions});
+  models.Lot.getIfAuthorized(req.params.id, req.token_data.userid, 1).then(function(lot){
+    lot.getEvents().then(function(events){
+      if(events.length < 1) return next(new error.NotFound("No events for lot."));
+      res.json({status:200, result:events});
+    });
+  }).catch(next);
+});
+
+router.post("/:id(\\d+)/event/:id2(\\d+)/resolve", auth, function(req, res, next){
+  var lotid = parseInt(req.params.id);
+  var eventid = parseInt(req.params.id2);
+
+  models.Lot.getIfAuthorized(lotid, req.token_data.userid, 1).then(function(lot){
+    lot.getEvents({where: {id:eventid}}).then(function(events){
+      if(events.length < 1) return next(new error.NotFound("No event with id: " + eventid));
+      if(events.length > 1) return next(new error.Internal());
+
+      events[0].destroy().then(function(rows){
+        if(rows === 0) return next(new error.Internal());
+        res.json({status:200, result:"Event resolved."});
       });
     });
   }).catch(next);
@@ -127,16 +147,12 @@ router.post("/:id(\\d+)/", auth, function(req, res, next){
     lot_data: data.lot_data,
     spot_data: data.spot_data
   }
-  models.Lot.findOne({where:{id:req.params.id}}).then(function(lot){
-    lot.checkPermissions(req.token_data.userid, 0).then(function(authorized){
-      if(!authorized)
-        return next(new error.Forbidden("User does not have permissions for lot."));
-      lot.update(attributes).then(function(lot){
-        res.status(200);
-        res.json({status:"200", result:"Lot updated.", id:lot.id});
-      });
+  models.Lot.getIfAuthorized(req.params.id, req.token_data.userid, 0).then(function(lot){
+    lot.update(attributes).then(function(lot){
+      res.status(200);
+      res.json({status:"200", result:"Lot updated.", id:lot.id});
     });
-  });
+  }).catch(next);
 });
 
 router.post("/", auth, function(req, res, next){

@@ -1,3 +1,5 @@
+error = require("../utilities/error");
+
 module.exports = function(sequelize, DataTypes) {
   var Lot = sequelize.define("Lot", {
       name: {
@@ -33,7 +35,17 @@ module.exports = function(sequelize, DataTypes) {
       associate: function(models) {
         Lot.hasMany(models.Infraction);
         Lot.hasMany(models.Transaction);
+        Lot.hasMany(models.Event);
         Lot.belongsToMany(models.User, {through: models.Permission});
+      },
+      getIfAuthorized: function(lotid, userid, level){
+        return Lot.findOne({where: {id:lotid}}).then(function(lot){
+          if(!lot) throw new error.NotFound("No lot with id: " + lotid);
+          return lot.checkPermissions(userid, level).then(function(authorized){
+            if(!authorized) throw new error.Forbidden();
+            return lot;
+          });
+        });
       }
     },
     instanceMethods: {
