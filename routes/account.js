@@ -68,7 +68,7 @@ router.post("/register", function(req, res, next){
     var salt = crypto.randomBytes(16).toString("hex");
     var token_salt = crypto.randomBytes(16).toString("hex");
     var key = crypto.pbkdf2Sync(data.password, salt, 100000, 64, "sha512").toString("hex");
-    models.User.create({username: data.username, password: key, salt: salt, token_salt: token_salt}).then(function(){
+    models.User.create({username: data.username, password: key, salt: salt, token_salt: token_salt, firstname: data.firstname, lastname: data.lastname}).then(function(){
       res.status(201).json({status:201, result:"Successfully created account."});
     });
   }).catch(next);
