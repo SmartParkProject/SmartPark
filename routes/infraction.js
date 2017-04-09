@@ -18,6 +18,10 @@ var infractionSchema = {
     },
     "image":{
       "type":"string"
+    },
+    "lotid":{
+      "type":"integer",
+      "minimum":0
     }
   },
   "required":["description", "token"]
@@ -41,7 +45,7 @@ router.post("/", auth, function(req, res, next){
     return next(new error.BadRequest("Bad parameter: " + ajv.errorsText()));
 
   //TODO: preprocess images to save space
-  models.Infraction.create({description: data.description, image_data: data.image, UserId: req.token_data.userid}).then(function(infraction){
+  models.Infraction.create({description: data.description, image_data: data.image, UserId: req.token_data.userid, LotId: data.lotid}).then(function(infraction){
     res.status(201);
     res.json({status:"201", result:"Infraction submitted successfully.", id:infraction.id});
   });
@@ -49,7 +53,7 @@ router.post("/", auth, function(req, res, next){
 
 //This post method isn't totally restful and actually gets an infraction.
 //For future projects, it would be better to have clients include the token in request headers.
-router.post("/:id(\\d+)/", function(req, res, next){
+router.post("/:id(\\d+)/", auth, function(req, res, next){
   req.params.id = parseInt(req.params.id);
   var data = req.body;
   var valid = ajv.validate(authSchema, data);
@@ -58,8 +62,18 @@ router.post("/:id(\\d+)/", function(req, res, next){
 
   //TODO: check user rights req.token_data.userid
   models.Infraction.findOne({where: {id:req.params.id}}).then(function(infraction){
-    res.status(200);
-    res.json({status:"200", result:infraction});
+    if(!infraction)
+      return next(new error.NotFound("No infraction with that id."));
+
+    infraction.getLot().then(function(lot){
+      lot.checkPermissions(req.token_data.userid, 1).then(function(authorized){
+        if(!authorized)
+          return next(new error.Forbidden());
+
+        res.status(200);
+        res.json({status:"200", result:infraction});
+      });
+    });
   });
 });
 

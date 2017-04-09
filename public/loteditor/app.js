@@ -418,10 +418,16 @@ function save(properties, callback){
     image_data: getImage(), //NOTE: This should be done last due to limitations of enhanceContext
     token: token
   }
-  sendJSON("POST", "/api/lot", data, function(response){
+  var url = "/api/lot";
+  if(currentLotId){
+    url = "/api/lot/" + currentLotId;
+  }
+  sendJSON("POST", url, data, function(response){
+    currentLotId = response.id;
     callback();
   });
 }
+var currentLotId = null;
 function load(){
   var token = getCookie("token");
   if(!token){
@@ -436,6 +442,7 @@ function load(){
     if(response.result){
       document.getElementById("properties").contentWindow.set(response.result[0]);
       root = deserialize(response.result[0].lot_data);
+      currentLotId = response.result[0].id;
     }
     tick();
   }, function(response){
