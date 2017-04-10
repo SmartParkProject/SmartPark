@@ -53,6 +53,12 @@ module.exports = function(sequelize, DataTypes) {
         return this.getUsers({where:{id:id}, through: {where:{level: {$lte: level}}}}).then(function(users){
           return users.length == 1;
         });
+      },
+      getAvailable: function(){
+        let lot = this; //"this" appears to be redefined in the promise
+        return lot.getTransactions().then(function(transactions){
+          return lot.spots-transactions.length;
+        });
       }
     }
   });

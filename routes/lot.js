@@ -210,7 +210,17 @@ router.post("/search", function(req, res, next){
     if(lots.length < 1)
       return next(new error.NotFound("No lots matching search criteria"));
 
-    res.json({status:200, result:lots});
+    //Get availability for each lot.
+    var results = [];
+    for(let i=0; i < lots.length; i++){
+      results.push(lots[i].getAvailable().then(function(available){
+        lots[i] = lots[i].get({plain: true});
+        lots[i].available = available;
+      }));
+    }
+    Promise.all(results).then(function(){
+      res.json({status:200, result:lots});
+    }).catch(next);
   }).catch(next);
 });
 
