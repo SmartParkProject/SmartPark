@@ -211,14 +211,14 @@ router.post("/search", function(req, res, next){
       return next(new error.NotFound("No lots matching search criteria"));
 
     //Get availability for each lot.
-    var results = [];
-    for(let i=0; i < lots.length; i++){
-      results.push(lots[i].getAvailable().then(function(available){
+    var requests = [];
+    for(let i = 0; i < lots.length; i++){
+      requests.push(lots[i].getAvailable().then(function(available){
         lots[i] = lots[i].get({plain: true});
         lots[i].available = available;
       }));
     }
-    Promise.all(results).then(function(){
+    Promise.all(requests).then(function(){
       res.json({status:200, result:lots});
     }).catch(next);
   }).catch(next);

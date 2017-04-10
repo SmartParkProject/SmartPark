@@ -24,7 +24,7 @@ var infractionSchema = {
       "minimum":0
     }
   },
-  "required":["description", "token"]
+  "required":["description", "token", "lotid"]
 };
 
 var authSchema = {
