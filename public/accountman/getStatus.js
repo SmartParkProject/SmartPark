@@ -11,7 +11,7 @@ $.ajax({
 		console.log(data);
 		$('#overviewParkStat').text("Checked In");
 		$('#currstatus').text("Checked In");
-		$('#currlot').text(data.result.lot);
+		$('#currlot').text(data.result.LotId);
 		$('#currspot').text(data.result.spot);
 		getLots();
 	},
@@ -42,8 +42,8 @@ function showPosition(position) {
 	success: function (data) {
 		console.log(data);
 		//var stringin = (data.result[1].name).toString();
-		console.log(data.result[1].name);
-		for(var i = 0; i < 2; i++)
+		//console.log(data.result[1].name);
+		for(var i = 0; i < data.result.length; i++)
 		{
 			let newopt = document.createElement("option");
 			newopt.text = (data.result[i].name).toString();
@@ -70,20 +70,20 @@ function report(value)
 	contentType:"application/json; charset=utf-8",
 	success: function (data) {
 		console.log(data);
-		for(var i = 1; i < data.result.length;i++)
+		for(var i = 0; i < data.result.length;i++)
 		{
 			if(data.result[i] != 0)
 			{
 				let newopt = document.createElement("option");
 			newopt.text = (i).toString();
-			newopt.value = (data.result[i]).toString();
+			newopt.value = i;
 			let select = document.getElementById("spot");
 			select.appendChild(newopt);
 			}
 		}
 	},
 	error: function(data){
-		
+		console.log(data);
 	}
 });
 	}

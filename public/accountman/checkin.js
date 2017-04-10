@@ -16,6 +16,7 @@ $.ajax({
 		$('#modalTitle').text("Parking Status: Success!");
 		$('#innerModal').text("Checked into Lot "+$('#lot').val()+" and spot "+$('#spot').val()+".");
 		$('#checkModal').modal("show");
+
 		
 	},
 	error: function (data) {

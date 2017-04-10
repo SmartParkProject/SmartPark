@@ -93,8 +93,8 @@ $.ajax({
 		var ctx = mycanvas.getContext("2d");
 		var image = new Image();
 		image.src = "data:image/png;base64," + data.result.image_data;
-		mycanvas.width = image.height;
-		mycanvas.height = image.width;
+		mycanvas.width = image.width;
+		mycanvas.height = image.height;
 		ctx.drawImage(image,0,0);
 		for(var i = 0; i < stringin.length; i++){
 			ctx.fillStyle = "green";
