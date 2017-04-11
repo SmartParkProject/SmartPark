@@ -1,4 +1,4 @@
-module.exports = function(sequelize, DataTypes) {
+module.exports = function(sequelize, DataTypes){
   var User = sequelize.define("User", {
     username: {
       type: DataTypes.STRING,
@@ -20,7 +20,7 @@ module.exports = function(sequelize, DataTypes) {
     lastname: DataTypes.STRING
   }, {
     classMethods: {
-      associate: function(models) {
+      associate: function(models){
         User.hasOne(models.Transaction);
         User.hasMany(models.Infraction);
         User.belongsToMany(models.Lot, {through: models.Permission});
