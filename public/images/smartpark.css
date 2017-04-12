@@ -56,11 +56,4 @@ body {
 	bottom: auto;
 	color: red;
 }
-.icon-bar
-{
-  background:gray !important; /*Whatever colour you want for icon lines*/
-}
-.navbar-toggle
-{
-  background:#00293C !important; /*Whatever colour you want for background */
-}
+

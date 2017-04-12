@@ -23,7 +23,7 @@
 <div class="navbar navbar-default navbar-fixed-top">
 	<div class="container-fluid">
 		<div class="navbar-header">
-			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header">
 			<span class="sr-only">Toggle Navigation</span>
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
@@ -31,7 +31,7 @@
 			</button>
 			<a class="navbar-brand" href='/'>Parking Smarter</a>
 		</div><!--Header-->
-		<div class="navbar-collapse collapse">
+		<div class="navbar-collapse collapse" id="header">
 		<ul class="nav navbar-nav">
 			<li><a href= "/">Home</a></li>
 			<li><a href="/about">About</a></li>
@@ -45,12 +45,23 @@
 		</div><!--collapse-->
 	</div><!--container-fluid-->
 </div><!--navfixed top-->
+
 <div class="container-fluid" id= "accountmancontainer" style="padding-top:50px">
 	<div class="row">
-	<div class="col-xs-12 col-sm-12 col-lg-12"><h3 class="page-header"> Hello! Welcome to your Smart Park account!</h3></div>
+	<div class="col-xs-12 col-sm-12 col-lg-12">
+		<h3 class="page-header"> Hello! Welcome to your Smart Park account!</h3></div>
 	</div>
 	<div class="row">
-		<div class="col-sm-12">
+		<div class="col-sm-12 col-lg-12">
+			<div class="nav navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#tabsMenu" style="background-color:black;">
+				<span class="sr-only">Toggle Navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				</button>
+			</div>
+		<div class="collapse navbar-collapse" id="tabsMenu">
 			<ul class="nav nav-tabs">
 				<li class="active"><a type="button" data-toggle="tab" href="#overview">Overview</a></li>
 				<li><a type="button" data-toggle="tab" href="#Useracct">User Account Details</a></li>
@@ -58,8 +69,9 @@
 				<li><a type="button" data-toggle="tab" href="#reservations">Reservations</a></li>
 				<li><a type="button" data-toggle="tab" href="#payment">Payment Information</a></li>
 			</ul>
-		</div>
+		</div><!--Nav Collapse-->
 	</div><!--Row-->
+
 <div class="tab-content">
 
 	<div id="overview" class="tab-pane fade in active">
@@ -71,7 +83,7 @@
 		</div>
 		<div class="form-group-vertical">
 				<label class="control-label">Current Amount Due:</label>
-						<p id="OverviewCurrAMTdue" class="form-control-static"></p>
+						<p id="OverviewCurrAMTdue" class="form-control-static">$0.00</p>
 		</div>
 		</form>
 	</div>
@@ -127,8 +139,8 @@
 	</div>
 	
 		<div id="payment" class="tab-pane fade">
-		<h4>Payment Options and Information<h4>
-		<p>Somthing</p>
+		<h2>Payment Options and Information</h2>
+		<a class="btn btn-success" href="/404">Redirection to payment Site</a>
 	</div>
 	
 		</div><!--Tabcontent end-->
