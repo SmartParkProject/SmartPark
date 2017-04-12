@@ -12,6 +12,9 @@ body {
 .navbar .navbar-brand {
 	color: white;
 }
+.nav.navbar-nav.nav-tabs li a{
+	color: black;
+}
 .col-xs-12.col-sm-12.col-lg-12{
 	background-color: red;
 }
