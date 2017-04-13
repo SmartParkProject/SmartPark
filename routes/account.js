@@ -17,6 +17,14 @@ var accountSchema = {
   "required": ["username", "password"]
 };
 
+var updateSchema = {
+  "properties": {
+    "password": {"$ref": "/password"},
+    "firstname": {"type": "string"},
+    "lastname": {"type": "string"}
+  }
+};
+
 var usernameSchema = {
   "type": "string",
   "minLength": 1,
@@ -91,6 +99,32 @@ router.post("/register", function(req, res, next){
   }).catch(next);
 });
 
+router.post("/update", auth, function(req, res, next){
+  var data = req.body;
+  var valid = ajv.validate(updateSchema, data);
+  if(!valid)
+    return next(new error.BadRequest("Bad parameter: " + ajv.errorsText()));
+  models.User.findOne({where: {id: req.token_data.userid}}).then(function(user){
+    var update = {};
+    if(data.lastname) update.lastname = data.lastname;
+    if(data.firstname) update.firstname = data.firstname;
+    if(data.password){
+      var salt = crypto.randomBytes(16).toString("hex");
+      var token_salt = crypto.randomBytes(16).toString("hex");
+      var key = crypto.pbkdf2Sync(data.password, salt, 100000, 64, "sha512").toString("hex");
+      update.token_salt = token_salt;
+      update.password = key;
+      update.salt = salt;
+    }
+    user.update(update).then(function(){
+      res.status(200).json({
+        status: 200,
+        result: "Successfully updated account."
+      });
+    });
+  });
+});
+
 router.post("/logout", auth, function(req, res, next){
   models.User.findOne({where: {id: req.token_data.userid}}).then(function(user){
     // This technically doesn't guarantee invalidation. It may be better to store
@@ -123,6 +157,18 @@ router.post("/lots", auth, function(req, res, next){
       else
         return next(new error.NotFound("No lots for user"));
     });
+  });
+});
+
+router.post("/permissions", auth, function(req, res, next){
+  models.Permission.findAll({where: {UserId: req.token_data.userid}}).then(function(permissions){
+    if(permissions.length > 0)
+      res.json({
+        status: 200,
+        result: permissions
+      });
+    else
+      return next(new error.NotFound("No permissions for user"));
   });
 });
 
