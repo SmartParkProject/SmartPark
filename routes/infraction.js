@@ -57,7 +57,6 @@ router.post("/:id(\\d+)/", auth, function(req, res, next){
   if(!valid)
     return next(new error.BadRequest("Bad parameter: " + ajv.errorsText()));
 
-  // TODO: check user rights req.token_data.userid
   models.Infraction.findOne({where: {id: req.params.id}}).then(function(infraction){
     if(!infraction)
       return next(new error.NotFound("No infraction with that id."));
