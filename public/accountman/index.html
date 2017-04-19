@@ -68,6 +68,7 @@
 				<li><a type="button" data-toggle="tab" href="#parkinfo">Parking Information</a></li>
 				<li><a type="button" data-toggle="tab" href="#reservations">Reservations</a></li>
 				<li><a type="button" data-toggle="tab" href="#payment">Payment Information</a></li>
+				<li><a type="button" id="infract" data-toggle="tab" href="#infractions" style="display: none;">Manage Infractions</a></li>
 			</ul>
 		</div><!--Nav Collapse-->
 	</div><!--Row-->
@@ -83,7 +84,7 @@
 		</div>
 		<div class="form-group-vertical">
 				<label class="control-label">Current Amount Due:</label>
-						<p id="OverviewCurrAMTdue" class="form-control-static">$0.00</p>
+						<p id="OverviewCurrAMTdue" class="form-control-static"></p>
 		</div>
 		</form>
 	</div>
@@ -94,55 +95,90 @@
 		<form class="form-inline" style="padding: 20px;">
 			<div class="form-group-vertical">
 				<label class="control-label">Email:</label>
-						<p class="form-control-static">youSomewhere@example.com</p>
+						<p id="email_p" class="form-control-static">youSomewhere@example.com</p>
 			</div>
 			<div class="form-group-vertical">
 				<label class="control-label">Password:</label>
-						<p class="form-control-static">Password</p>
+						<p id="password_p" class="form-control-static">Password</p>
 			</div>
 		</form>
 	</div>
 	
 		<div id="parkinfo" class="tab-pane fade" data-toggle="validator">
-		<h2>User Parking Information</h2>
-			<form class="form-inline" style="padding: 20px;">
-				<div class="form-group-vertical">
-								<p>*Options Listed are based on Geolocation</p>
-								<select class="form-control" id="lot" onchange="report(this.value)">
-									<option>Please select a parking lot</option>
-								</select>
-								<select class="form-control" id="spot">
-									<option>Please Select Spot</option>
-								</select>
-								<button class="btn btn-success" onClick="checkin()" data-toggle="tab" href="#parkinfo">Check In</button>
-								<button class="btn btn-default"  onClick="checkout()" data-toggle="tab" href="#parkinfo">Check Out</button>
-				</div>
-				<div class="form-group-vertical">
-					<label class="control-label">Current Parking Status:</label>
-							<p id="currstatus" class="form-control-static"></p>
-				</div>
-				<div class="form-group-vertical">
-					<label class="control-label">Current Parking Lot:</label>
-							<p id="currlot" class="form-control-static">None</p>
-				</div>
-				<div class="form-group-vertical">
-					<label class="control-label">Spot:</label>
-							<p id="currspot" class="form-control-static">None</p>
-				</div>
-			</form>
-	</div>
+			<div class="row">
+				<div class="col-sm-2">
+				</div><!--col3-->
+				<div class="col-sm-8">
+				<h2>User Parking Information</h2>
+					<form class="form-inline" style="padding: 20px;">
+						<div class="form-group-vertical">
+										<p id="disclaimer">*Options Listed are based on your provided location (Geolocation)</p>
+										<select class="form-control" id="lot" onchange="report(this.value)">
+											<option>Please select a parking lot</option>
+										</select>
+										<select class="form-control" id="spot">
+											<option>Please Select Spot</option>
+										</select>
+										<button class="btn btn-success" onClick="checkin()" data-toggle="tab" href="#parkinfo">Check In</button>
+										<button class="btn btn-default"  onClick="checkout()" data-toggle="tab" href="#parkinfo">Check Out</button>
+						</div>
+						<div class="form-group-vertical">
+							<label class="control-label">Current Parking Status:</label>
+									<p id="currstatus" class="form-control-static"></p>
+						</div>
+						<div class="form-group-vertical">
+							<label class="control-label">Current Parking Lot:</label>
+									<p id="currlot" class="form-control-static">None</p>
+						</div>
+						<div class="form-group-vertical">
+							<label class="control-label">Spot:</label>
+									<p id="currspot" class="form-control-static">None</p>
+						</div>
+					</form>
+				</div><!--col-sm-6-->
+				<div class="col-sm-2">
+				</div><!--col3-->
+			</div><!--row-->
+		</div><!--parkinfo-->
 	
 	
 	<div id="reservations" class="tab-pane fade">
-		<h2>Reservations</h2>
-		<p></p>
+				<h2>Reservations</h2>
+				<p></p>
 	</div>
 	
-		<div id="payment" class="tab-pane fade">
-		<h2>Payment Options and Information</h2>
-		<a class="btn btn-success" href="/404">Redirection to payment Site</a>
+	<div id="payment" class="tab-pane fade">
+		<div class="row">
+			<div class="col-sm-3">
+			</div>
+			<div class="col-sm-6">
+			<h2>Payment Options and Information</h2>
+			<a class="btn btn-success" href="/404">Redirection to payment Site</a>
+			</div>
+			<div class="col-sm-3">
+			</div>
+		</div>
+	</div><!--payment tabcontent-->
+	<div id="infractions" class="tab-pane fade">
+		<div class="row">
+			<div class="col-sm-1"></div>
+			<div class="col-sm-2">
+				<h2 style="display: inline-block">Lot Access</h2>
+				<p>Access the lot editor for your account</p>
+				<a class="btn btn-default" href="/loteditor" role="button">Lot Editor</a>
+			</div><!--col3-->
+			<div class="col-sm-9">
+					<div>
+					<h2 id="infract_header" style="display: inline-block; padding-right: 20px; text-decoration: underline;"></h2>
+					<button class="btn btn-default" onclick="populateTable()" style="display: inline">Refresh Table</button>
+					</div>
+				<div class="container">
+					<table class="table-striped">
+					</table>
+				</div>
+			</div><!--col9-->
+		</div>
 	</div>
-	
 		</div><!--Tabcontent end-->
 </div><!--Dashboard container -->
 
