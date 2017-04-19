@@ -96,7 +96,7 @@ function getMapLoc(position){
 		//console.log(myLatLng);
 		//console.log("Success");
 		}//end for loop
-		
+
 	},
 	error: function (data) {
 		console.log(data);
@@ -141,7 +141,7 @@ function getMapLocError(lat, lng){
 		//console.log(myLatLng);
 		//console.log("Success");
 		}//end for loop
-		
+
 	},
 	error: function (data) {
 		console.log(data);
@@ -149,7 +149,7 @@ function getMapLocError(lat, lng){
 });
 }
 function writeToModal(id){//TODO: make this function show a modal from the getcustMap function below.
-console.log("blah");	
+console.log("blah");
 getcustMap(id);
 }
 function getcustMap(lotID){
@@ -161,12 +161,12 @@ $.ajax({
 	url: "https://smartparkproject.tk/api/lot/"+lotID+"/available",
 	dataType: "json",
 	contentType:"application/json; charset=utf-8",
-	success: function (data2) {
+  success: function (data2) {
 	//console.log(data2);
 	for(var i=0; i < data2.result.length; i++)
 	{
 		avail_array[i] = data2.result[i];
-		
+
 	}
 	$.ajax({
 	type: "GET",
@@ -190,28 +190,31 @@ $.ajax({
 		var mycanvas = document.createElement("canvas");
 		var ctx = mycanvas.getContext("2d");
 		var image = new Image();
+    image.onload = function(){
+      mycanvas.width = image.width;
+  		mycanvas.height = image.height;
+  		ctx.drawImage(image,0,0);
+  		for(var i = 0; i < stringin.length; i++){
+  			let compare_num = avail_array[i];
+  			if(avail_array[i]==1){
+  			ctx.fillStyle = "green";
+  			ctx.beginPath();
+  			ctx.ellipse(x_array[i], (y_array[i]+20), 10, 10, 0, 0, 2 * Math.PI);
+  			ctx.fill();
+  			}
+  			else if(avail_array[i]==0){
+  				ctx.fillStyle="red";
+  				ctx.beginPath();
+  				ctx.rect((x_array[i]-9), (y_array[i]+5),20,20,0,0)
+  				ctx.fill();
+  			}
+  		}
+  		var image_out = mycanvas.toDataURL();
+      console.log("OUT: " + image_out.length);
+  		document.getElementById("mapimage").src=image_out;
+  		$('#mapModal').modal("show");
+    };
 		image.src = "data:image/png;base64," + data.result.image_data;
-		mycanvas.width = image.width;
-		mycanvas.height = image.height;
-		ctx.drawImage(image,0,0);
-		for(var i = 0; i < stringin.length; i++){
-			let compare_num = avail_array[i];
-			if(avail_array[i]==1){			
-			ctx.fillStyle = "green";
-			ctx.beginPath();
-			ctx.ellipse(x_array[i], (y_array[i]+20), 10, 10, 0, 0, 2 * Math.PI);
-			ctx.fill();
-			}
-			else if(avail_array[i]==0){
-				ctx.fillStyle="red";
-				ctx.beginPath();
-				ctx.rect((x_array[i]-9), (y_array[i]+5),20,20,0,0)
-				ctx.fill();
-			}
-		}
-		var image_out = mycanvas.toDataURL();
-		document.getElementById("mapimage").src=image_out;
-		$('#mapModal').modal("show");		
 	},
 	error: function (data) {
 		console.log(data);
