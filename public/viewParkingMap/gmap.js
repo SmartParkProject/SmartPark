@@ -195,13 +195,13 @@ $.ajax({
   		ctx.drawImage(image,0,0);
   		for(var i = 0; i < stringin.length; i++){
   			let compare_num = avail_array[i];
-  			if(avail_array[i]==1){
+  			if(avail_array[id_array[i]]==1){
   			ctx.fillStyle = "green";
   			ctx.beginPath();
   			ctx.ellipse(x_array[i], (y_array[i]+20), 10, 10, 0, 0, 2 * Math.PI);
   			ctx.fill();
   			}
-  			else if(avail_array[i]==0){
+  			else if(avail_array[id_array[i]]==0){
   				ctx.fillStyle="red";
   				ctx.beginPath();
   				ctx.rect((x_array[i]-9), (y_array[i]+5),20,20,0,0)

@@ -76,4 +76,33 @@ router.post("/:id(\\d+)/", auth, function(req, res, next){
   });
 });
 
+router.post("/:id(\\d+)/resolve", auth, function(req, res, next){
+  req.params.id = parseInt(req.params.id);
+  var data = req.body;
+  var valid = ajv.validate(authSchema, data);
+  if(!valid)
+    return next(new error.BadRequest("Bad parameter: " + ajv.errorsText()));
+
+  models.Infraction.findOne({where: {id: req.params.id}}).then(function(infraction){
+    if(!infraction)
+      return next(new error.NotFound("No infraction with that id."));
+
+    infraction.getLot().then(function(lot){
+      lot.checkPermissions(req.token_data.userid, 1).then(function(authorized){
+        if(!authorized)
+          return next(new error.Forbidden());
+        infraction.destroy().then(function(rows){
+          if(rows === 0)
+            return next(new error.Internal());
+
+          res.json({
+            status: "200",
+            result: "Infraction resolved."
+          });
+        });
+      });
+    });
+  });
+});
+
 module.exports = router;
