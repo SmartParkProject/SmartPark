@@ -1,8 +1,8 @@
 function AuthUser(){	
 	var cookies = document.cookie;
-	console.log(cookies);
+	//console.log(cookies);
 	var token = cookies.substr(6, cookies.length);
-	console.log(token);
+	//console.log(token);
 
 		$.ajax({
 	type: "POST",

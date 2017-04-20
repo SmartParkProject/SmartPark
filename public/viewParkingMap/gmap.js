@@ -148,8 +148,7 @@ function getMapLocError(lat, lng){
 	}
 });
 }
-function writeToModal(id){//TODO: make this function show a modal from the getcustMap function below.
-console.log("blah");
+function writeToModal(id){
 getcustMap(id);
 }
 function getcustMap(lotID){

@@ -15,14 +15,18 @@ body {
 .nav.navbar-nav.nav-tabs li a{
 	color: black;
 }
+.nav.navbar-nav.nav-tabs{
+	background-color: #ccd4d8;
+}
 .col-xs-12.col-sm-12.col-lg-12{
-	background-color: red;
+	background-color: #99a9b1;
 }
 .carousel-caption{
 	top: 0px;
 	bottom: auto;
 	color: red;
 }
+.carousel-inner > .item > img { width:100%; height:640px; }
 .icon-bar
 {
   background:gray !important; /*Whatever colour you want for icon lines*/

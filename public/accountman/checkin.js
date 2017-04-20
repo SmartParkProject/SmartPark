@@ -1,7 +1,7 @@
 function checkin(){
 	cookies = document.cookie;
 	token = cookies.substr(6, cookies.length);
-	console.log($('#lot').val());
+	//console.log($('#lot').val());
 $.ajax({
 	type: "POST",
 	url: "https://smartparkproject.tk/api/parking/",
@@ -15,6 +15,8 @@ $.ajax({
 		$('#currstatus').text("Checked In");
 		$('#modalTitle').text("Parking Status: Success!");
 		$('#innerModal').text("Checked into Lot "+$('#lot').val()+" and spot "+$('#spot').val()+".");
+		$('#lot').prop("disabled", true);
+		$('#spot').prop("disabled", true);
 		$('#checkModal').modal("show");
 
 		
@@ -44,6 +46,8 @@ $.ajax({
 		$('#currstatus').text("Not Currently Checked In");
 		$('#modalTitle').text("Parking Status: Successfully Checked out!");
 		$('#innerModal').text("You are no longer parked into the spot. Thank you");
+		$('#lot').prop("disabled", false);
+		$('#spot').prop("disabled", false);
 		$('#checkModal').modal("show");
 	},
 	error: function (data) {
