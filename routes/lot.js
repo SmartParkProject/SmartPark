@@ -20,6 +20,12 @@ var searchSchema = {
   "required": ["lat", "lng", "distance"]
 };
 
+var userSchema = {
+  "username": {"type": "string"},
+  "level": {"type": "integer"},
+  "required": ["username", "level"]
+};
+
 var lotSchema = {
   "name": {"type": "string"},
   "lat": {"type": "string"},
@@ -87,6 +93,74 @@ router.post("/:id(\\d+)/events", auth, function(req, res, next){
       res.json({
         status: 200,
         result: events
+      });
+    });
+  }).catch(next);
+});
+
+router.post("/:id(\\d+)/users", auth, function(req, res, next){
+  req.params.id = parseInt(req.params.id);
+
+  models.Lot.getIfAuthorized(req.params.id, req.token_data.userid, 0).then(function(lot){
+    models.Permission.findAll({
+      where: {LotId: lot.id},
+      include: {
+        model: models.User,
+        attributes: ["username"]
+      }
+    }).then(function(permissions){
+      if(permissions.length < 1)
+        return next(new error.NotFound("No permissions for lot."));
+
+      res.json({
+        status: 200,
+        result: permissions
+      });
+    });
+  }).catch(next);
+});
+
+router.post("/:id(\\d+)/user", auth, function(req, res, next){
+  req.params.id = parseInt(req.params.id);
+  var data = req.body;
+  var valid = ajv.validate(userSchema, data);
+  if(!valid)
+    return next(new error.BadRequest("Bad parameter: " + ajv.errorsText()));
+
+  if(data.level === -1){
+    models.User.findOne({where: {username: data.username}}).then(function(user){
+      if(!user)
+        return next(new error.NotFound("User does not exist."));
+
+      models.Permission.findOne({
+        where: {
+          LotId: req.params.id,
+          UserId: user.id
+        }
+      }).then(function(permission){
+        if(!permission)
+          return next(new error.NotFound("User has no permissions."));
+        permission.destroy().then(function(){
+          res.json({
+            status: 200,
+            result: "Updated permission."
+          });
+        });
+      });
+    });
+    return;
+  }
+  models.Lot.getIfAuthorized(req.params.id, req.token_data.userid, 0).then(function(lot){
+    models.User.findOne({where: {username: data.username}}).then(function(user){
+      if(!user)
+        return next(new error.NotFound("User does not exist"));
+
+      lot.addUser(user, {level: data.level}).then(function(){
+        res.json({
+          status: "200",
+          result: "Updated permission.",
+          id: lot.id
+        });
       });
     });
   }).catch(next);

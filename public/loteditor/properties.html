@@ -5,20 +5,45 @@
   <script src="properties.js"></script>
 </head>
 <body>
-  <div>
-    <h2>Lot Properties</h2>
-    <label for="name">Name: </label><br>
-    <input id="name"></input>
-    <br><br>
-    <label for="lat">Latitude: </label><br>
-    <input id="lat"></input>
-    <br><br>
-    <label for="lng">Longitude: </label><br>
-    <input id="lng"></input>
+  <div id="content">
+    <div>
+      <h2>Editor Properties</h2>
+      <label for="width">Width: </label><br>
+      <input id="width" value="1920"></input>
+      <br><br>
+      <label for="height">Height: </label><br>
+      <input id="height" value="1080"></input>
+      <br><br>
+      <input id="update_button" type="button" value="Update"></input>
+    </div>
+    <div>
+      <h2>Lot Properties</h2>
+      <label for="name">Name: </label><br>
+      <input id="name"></input>
+      <br><br>
+      <label for="lat">Latitude: </label><br>
+      <input id="lat"></input>
+      <br><br>
+      <label for="lng">Longitude: </label><br>
+      <input id="lng"></input>
+      <br><br>
+      <input id="save_button" type="button" value="Save lot"></input>
+    </div>
+    <div id="members">
+      <h2>Members</h2>
+      <div id="list">Loading...</div>
+      <input id="member" placeholder="Username"></input>
+      <select id="level">
+        <option value="-1">None</option>
+        <option value="0">Owner</option>
+        <option value="1" selected>Guard</option>
+      </select>
+      <input id="member_button" type="button" value="Add permission"></input>
+    </div>
   </div>
   <div>
-    <input id="save_button" type="button" value="Save lot"></input>
-    <span id="output"></div>
+    <span id="output"></span>
   </div>
+
 </body>
 </html>
