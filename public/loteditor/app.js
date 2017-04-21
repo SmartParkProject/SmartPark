@@ -41,6 +41,13 @@ function setScale(scale){
   ctx.resetTransform();
   ctx.scale(scale, scale);
 }
+function setSize(width, height){
+  STAGE_WIDTH = width;
+  STAGE_HEIGHT = height;
+  root.width = width;
+  root.height = height;
+  setMinimumScale(minimumScale);
+}
 function setMinimumScale(scale){
   minimumScale = scale;
   stagePosition = {};
@@ -424,6 +431,9 @@ function save(properties, callback){
   }
   sendJSON("POST", url, data, function(response){
     currentLotId = response.id;
+    document.getElementById("properties").contentWindow.lotid = response.id;
+    document.getElementById("properties").contentWindow.token = getCookie("token");
+    document.getElementById("properties").contentWindow.getMembers();
     callback();
   });
 }
@@ -440,9 +450,13 @@ function load(){
   }
   sendJSON("POST", "/api/account/lots", data, function(response){
     if(response.result){
-      document.getElementById("properties").contentWindow.set(response.result[0]);
       root = deserialize(response.result[0].lot_data);
+      //NOTE: Hacky lot property
+      if(root.width && root.height){
+        setSize(root.width, root.height);
+      }
       currentLotId = response.result[0].id;
+      document.getElementById("properties").contentWindow.set(response.result[0], token);
     }
     tick();
   }, function(response){

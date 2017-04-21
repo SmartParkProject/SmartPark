@@ -4,3 +4,15 @@ body{
 body > *{
   display: inline-block;
 }
+#content{
+  display: flex;
+}
+#content > *{
+  padding-right: 50px;
+}
+#list{
+  border: 1px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  min-height: 173px;
+}
