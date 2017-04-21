@@ -70,7 +70,7 @@
 				<li><a type="button" data-toggle="tab" href="#reservations">Reservations</a></li>
 				<li><a type="button" data-toggle="tab" href="#payment">Payment Information</a></li>
 				<li><a type="button" data-toggle="tab" href="#infractionReport">Report Infraction</a></li>
-				<li><a type="button" id="infract" data-toggle="tab" href="#infractions" style="display: none;">Manage Infractions</a></li>
+				<li><a type="button" id="infract" data-toggle="tab" href="#infractions" style="display: none;">Manage Lots</a></li>
 			</ul>
 		</div><!--Nav Collapse-->
 	</div><!--Row-->
@@ -176,8 +176,8 @@
 	<div id="infractionReport" class="tab-pane fade">
 		<div class="container-fluid">
 			<div class="row">
-				<div class="col-sm-2"></div>
-				<div class="col-sm-8">
+				<div class="col-sm-3"></div>
+				<div class="col-sm-6">
 					<h2>Report Infractions</h2>
 					<form class="form-horizontal">
 						<div class="form-group">
@@ -193,14 +193,22 @@
 						</div>
 					</form>
 				</div><!--10-->
-				<div class="col-sm-2"></div>
+				<div class="col-sm-3"></div>
 			</div>
 		</div><!--outer Container-->
 	</div><!--infractionsReport-->
 	
 	<div id="reservations" class="tab-pane fade">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-sm-2"></div>
+				<div class="col-sm-8">
 				<h2>Reservations</h2>
 				<p></p>
+				</div>
+				<div class="col-sm-2"></div>
+			</div>
+		</div><!--outer Container-->				
 	</div>
 	
 	<div id="payment" class="tab-pane fade">
@@ -243,6 +251,7 @@
 									<tr>
 										<th>User ID</th>
 										<th>Lot ID</th>
+										<th>Type</th>
 										<th>Event ID</th>
 										<th>Created</th>
 										<th>Description</th>
@@ -323,6 +332,22 @@
 			</div>
 			<div class="modal-body">
 			<p id="infractText"></p>
+			</div>
+			<div class="modal-footer">
+				<button id="infractClose" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div><!--infractModal div-->
+
+<div id="disImg" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 id="modalTitle" class="modal-title">Infraction Image</h3>			
+			</div>
+			<div class="modal-body">
+				<img id="infractImage" style="max-height: 100%; max-width: 100%;">
 			</div>
 			<div class="modal-footer">
 				<button id="infractClose" type="button" class="btn btn-default" data-dismiss="modal">Close</button>

@@ -199,6 +199,7 @@ function submitReport(){
 	}
 });
 }
+var infractions;
 function populateTable(value){
 	var len = document.getElementById('infractTable').rows.length;
 	if((document.getElementById('infractTable').rows.length) > 1){
@@ -209,6 +210,8 @@ function populateTable(value){
 	}
 	cookies = document.cookie;
 	token = cookies.substr(6, cookies.length);
+	var j = 1;
+	
 		$.ajax({
 		type: "POST",
 		url: "https://smartparkproject.tk/api/lot/"+value+"/infractions",
@@ -223,50 +226,140 @@ function populateTable(value){
 			//var cell2 = row2.insertCell(0);
 			//cell.innerHTML="blah";
 			//cell2.innerHTML="blah";
+			infractions = data.result;
 			for(var i=1; i <= data.result.length; i++){
 				$('#infractError').text("");
-				let row = document.getElementById('infractTable').insertRow(i);
+				let row = document.getElementById('infractTable').insertRow(j++);
 				let cell = row.insertCell(0);
 				let cell2 = row.insertCell(1);
-				let cell3 = row.insertCell(2);
+				let cell3 = row.insertCell(2);//new//
 				let cell4 = row.insertCell(3);
 				let cell5 = row.insertCell(4);
 				let cell6 = row.insertCell(5);
 				let cell7 = row.insertCell(6);
+				let cell8 = row.insertCell(7);
 				cell.innerHTML = (data.result[i-1].UserId).toString();
 				cell2.innerHTML = (data.result[i-1].LotId).toString();
-				cell3.innerHTML = (data.result[i-1].id).toString();
-				cell4.innerHTML = (data.result[i-1].createdAt).toString();
-				cell5.innerHTML = (data.result[i-1].description).toString();
+				cell3.innerHTML = "Infraction"
+				cell4.innerHTML = (data.result[i-1].id).toString();
+				cell5.innerHTML = (data.result[i-1].createdAt).toString();
+				cell6.innerHTML = (data.result[i-1].description).toString();
 				if(data.result[i-1].image_data == null){
-					cell6.innerHTML = "No Picture";
+					cell7.innerHTML = "N/A";
 				}
 				else{
-					cell6.innerHTML = "<a class='btn btn-success'>View Image</a>";//TODO: get this to correctly draw an image in a modal//
+					cell7.innerHTML = "<a class='btn btn-success' onclick='drawImage("+(i-1)+")'>View Image</a>";//TODO: get this to correctly draw an image in a modal//
 				}
-				cell7.innerHTML = "<a class='btn btn-default' onclick='resolveInfraction("+data.result[i-1].id+","+data.result[i-1].LotId+")'>Resolve</a>";
+				cell8.innerHTML = "<a class='btn btn-default' onclick='resolveInfraction("+data.result[i-1].id+","+data.result[i-1].LotId+")'>Resolve</a>";
 			}
 			
 		},
 		error: function (data) {
-			$('#infractError').text("You do not have permission for this table.");
+			if(data.status != "404")
+			{
+				$('#infractError').text("You do not have permission for this table.");
+			}
+			//else if(
 			console.log(data, "error");
 		}
 	});
-}
-function resolveInfraction(value, lotid){//TODO: Get this call to work. Seems to not want to behave...//
 	$.ajax({
 		type: "POST",
-		url: "https://smartparkproject.tk/api/lot/"+lotid+"/events/"+value+"/resolve",
+		url: "https://smartparkproject.tk/api/lot/"+value+"/events",
 		dataType: "json",
 		contentType:"application/json; charset=utf-8",
 		data: JSON.stringify({token: token}),
 		success: function (data) {
 			console.log(data, "success");
+			//var row = document.getElementById("infractTable").insertRow(1);
+			//var row2 = document.getElementById("infractTable").insertRow(2);
+			//var cell = row.insertCell(0);
+			//var cell2 = row2.insertCell(0);
+			//cell.innerHTML="blah";
+			//cell2.innerHTML="blah";
+			for(var i=1; i <= data.result.length; i++){
+				$('#infractError').text("");
+				let row = document.getElementById('infractTable').insertRow(j++);
+				let cell = row.insertCell(0);
+				let cell2 = row.insertCell(1);
+				let cell3 = row.insertCell(2);//new//
+				let cell4 = row.insertCell(3);
+				let cell5 = row.insertCell(4);
+				let cell6 = row.insertCell(5);
+				let cell7 = row.insertCell(6);
+				let cell8 = row.insertCell(7);
+				cell.innerHTML = "N/A";
+				cell2.innerHTML = (data.result[i-1].LotId).toString();
+				cell3.innerHTML = "Event-"+(data.result[i-1].code).toString();
+				cell4.innerHTML = (data.result[i-1].id).toString();
+				cell5.innerHTML = (data.result[i-1].createdAt).toString();
+				cell6.innerHTML = (data.result[i-1].message).toString();
+				cell7.innerHTML = "N/A";
+				cell8.innerHTML = "<a class='btn btn-warning' onclick='resolveEvent("+data.result[i-1].id+","+data.result[i-1].LotId+")'>Resolve</a>";
+			}
+			
+		},
+		error: function (data) {
+			if(data.status != "404")
+			{
+				$('#infractError').text("You do not have permission for this table.");
+			}
+			console.log(data, "error");
+		}
+	});
+}
+function resolveInfraction(infractid, lotid){
+	$.ajax({
+		type: "POST",
+		url: "https://smartparkproject.tk/api/infraction/"+infractid+"/resolve",
+		dataType: "json",
+		contentType:"application/json; charset=utf-8",
+		data: JSON.stringify({token: token}),
+		success: function (data) {
+			console.log(data, "success");
+			populateTable($('#adminSelect').val());
 			
 		},
 		error: function (data) {
 			console.log(data, "error");
 		}
 	});
+}
+function resolveEvent(eventid, lotid){
+	$.ajax({
+		type: "POST",
+		url: "https://smartparkproject.tk/api/lot/"+lotid+"/event/"+eventid+"/resolve",
+		dataType: "json",
+		contentType:"application/json; charset=utf-8",
+		data: JSON.stringify({token: token}),
+		success: function (data) {
+			console.log(data, "success");
+			populateTable($('#adminSelect').val());
+			
+		},
+		error: function (data) {
+			console.log(data, "error");
+		}
+	});
+}
+function drawImage(imageIndex){
+
+	
+	// Decode the string
+	var decoded = atob(infractions[imageIndex].image_data);
+	//console.log(decoded);
+
+	// if the file extension is unknown
+	var extension = undefined;
+	// do something like this
+	var lowerCase = decoded.toLowerCase();
+	if (lowerCase.indexOf("png") !== -1) extension = "png"
+	else if (lowerCase.indexOf("jpg") !== -1 || lowerCase.indexOf("jpeg") !== -1)
+    	extension = "jpg"
+	else extension = "tiff";
+	var image = document.getElementById("infractImage");
+	image.src = "data:image/"+extension+";base64," +infractions[imageIndex].image_data;
+	$('#disImg').modal("show");
+
+	
 }
