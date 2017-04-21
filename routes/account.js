@@ -160,6 +160,18 @@ router.post("/lots", auth, function(req, res, next){
   });
 });
 
+router.post("/details", auth, function(req, res){
+  models.User.findOne({
+    where: {id: req.token_data.userid},
+    attributes: ["id", "username", "firstname", "lastname", "createdAt"]
+  }).then(function(user){
+    res.json({
+      status: 200,
+      result: user
+    });
+  });
+});
+
 router.post("/permissions", auth, function(req, res, next){
   models.Permission.findAll({where: {UserId: req.token_data.userid}}).then(function(permissions){
     if(permissions.length > 0)
