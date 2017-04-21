@@ -141,22 +141,13 @@ function report(value)
 {
 	var len = $('#spot').length;
 	$('#spot').empty();
-	//if(value==-1)
-	//{
-		//for(i = 1; i<len;i++)
-		//{
-		//	$('#spot')[i].removeChild();
-		//}
-	//}
-	//else
-	//{
 	$.ajax({
 	type: "GET",
 	url: "https://smartparkproject.tk/api/lot/"+value+"/available",
 	dataType: "json",
 	contentType:"application/json; charset=utf-8",
 	success: function (data) {
-		console.log(data);
+		//console.log(data);
 		for(var i = 0; i < data.result.length;i++)
 		{
 			if(data.result[i] != 0)
@@ -170,7 +161,7 @@ function report(value)
 		}
 	},
 	error: function(data){
-		console.log(data);
+		//console.log(data);
 	}
 });
 	//}
@@ -185,14 +176,14 @@ function submitReport(){
 	contentType:"application/json; charset=utf-8",
 	data: JSON.stringify({description: $('#comment').val(),token: token, lotid:Number($('#infractLotSelect').val())}),
 	success: function (data) {
-		console.log(data, "success");
+		//console.log(data, "success");
 		$("#infractText").text("Infraction Report Successfully Submitted.");
 		$('#infractModal').modal("show");
 		$('#comment').val('');
 		
 	},
 	error: function(data){
-		console.log(data);
+		//console.log(data);
 		$("#infractText").text("Infraction report submission failure. Please check your information to see if it is correct.");
 		$('#infractModal').modal("show");
 		$('#comment').val('');
@@ -219,7 +210,7 @@ function populateTable(value){
 		contentType:"application/json; charset=utf-8",
 		data: JSON.stringify({token: token}),
 		success: function (data) {
-			console.log(data, "success");
+			//console.log(data, "success");
 			//var row = document.getElementById("infractTable").insertRow(1);
 			//var row2 = document.getElementById("infractTable").insertRow(2);
 			//var cell = row.insertCell(0);
@@ -232,7 +223,7 @@ function populateTable(value){
 				let row = document.getElementById('infractTable').insertRow(j++);
 				let cell = row.insertCell(0);
 				let cell2 = row.insertCell(1);
-				let cell3 = row.insertCell(2);//new//
+				let cell3 = row.insertCell(2);
 				let cell4 = row.insertCell(3);
 				let cell5 = row.insertCell(4);
 				let cell6 = row.insertCell(5);
@@ -260,7 +251,7 @@ function populateTable(value){
 				$('#infractError').text("You do not have permission for this table.");
 			}
 			//else if(
-			console.log(data, "error");
+			//console.log(data, "error");
 		}
 	});
 	$.ajax({
@@ -270,7 +261,7 @@ function populateTable(value){
 		contentType:"application/json; charset=utf-8",
 		data: JSON.stringify({token: token}),
 		success: function (data) {
-			console.log(data, "success");
+			//console.log(data, "success");
 			//var row = document.getElementById("infractTable").insertRow(1);
 			//var row2 = document.getElementById("infractTable").insertRow(2);
 			//var cell = row.insertCell(0);
@@ -304,7 +295,7 @@ function populateTable(value){
 			{
 				$('#infractError').text("You do not have permission for this table.");
 			}
-			console.log(data, "error");
+			//console.log(data, "error");
 		}
 	});
 }
@@ -316,12 +307,12 @@ function resolveInfraction(infractid, lotid){
 		contentType:"application/json; charset=utf-8",
 		data: JSON.stringify({token: token}),
 		success: function (data) {
-			console.log(data, "success");
+			//console.log(data, "success");
 			populateTable($('#adminSelect').val());
 			
 		},
 		error: function (data) {
-			console.log(data, "error");
+			//console.log(data, "error");
 		}
 	});
 }
@@ -333,12 +324,12 @@ function resolveEvent(eventid, lotid){
 		contentType:"application/json; charset=utf-8",
 		data: JSON.stringify({token: token}),
 		success: function (data) {
-			console.log(data, "success");
+			//console.log(data, "success");
 			populateTable($('#adminSelect').val());
 			
 		},
 		error: function (data) {
-			console.log(data, "error");
+			//console.log(data, "error");
 		}
 	});
 }

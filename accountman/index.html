@@ -108,7 +108,12 @@
 					<h2>User Details</h2>
 					<form class="form-signin" style="padding: 20px;">
 						<div class="form-group">
-		
+							<label class="control-label">UserName:</label>
+							<p id="email_p" class="form-control"style="max-width: 300px;"></p>
+							<label class="control-label">First Name:</label>
+							<p class="form-control" id="userf_name" style="max-width: 300px;">First Name Here</p>
+							<label class="control-label">Last Name:</label>
+							<p class="form-control" id="userl_name" style="max-width: 300px;">Last Name Here</p>
 						</div>
 					</form>
 				</div>
@@ -116,17 +121,16 @@
 					<h2>Modify Details</h2>
 					<form class="form-signin" style="padding: 20px;">
 						<div class="form-group">
-							<label class="control-label">UserName:</label>
-							<p id="email_p" class="form-control"style="max-width: 300px;">Placeholder</p>
 							<label class="control-label" >Password:</label>
 							<input type="password" class="form-control" id="password_p" placeholder="Password"  style="max-width: 300px;"required autofocus>
-							<label class="control-label">Confirm Password:</label>
+							<label class="control-label">Confirm Password:*</label>
 							<input type="password" class="form-control" id="password_conf" placeholder="Confirm Password" style="max-width: 300px;" required autofocus>
-							<label class="control-label">First Name:</label>
+							<label class="control-label">First Name:*</label>
 							<input type="text" class="form-control" id="f_name" placeholder="First Name"  style="max-width: 300px;" autofocus>
-							<label class="control-label">Last Name:</label>
+							<label class="control-label">Last Name:*</label>
 							<input type="text" class="form-control" id="l_name" placeholder="Last Name"  style="max-width: 300px;" autofocus>
 							<button type="button" onclick="modAcct()" class="btn btn-success">Submit</button>
+							<h6>* - indicates optional change</h6>
 						</div>
 					</form>
 				</div>
@@ -318,7 +322,7 @@
 			<p id="innerModal"></p>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button type="button" id="checkmodalclose" class="btn btn-default" data-dismiss="modal">Close</button>
 			</div>
 		</div>
 	</div>

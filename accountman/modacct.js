@@ -12,8 +12,9 @@ function modAcct(){
 		success: function (data) {
 			console.log(data);
 			$('#modalTitle').text("Update Successful");
-			$('#innerModal').text("Your account information has been successfully updated.");
-			$('#checkModal').modal("show");;
+			$('#innerModal').text("Your account information has been successfully updated. You will need to log in again if you changed your password.");
+			$('#checkmodalclose').click(function(){location.reload()});
+			$('#checkModal').modal("show");
 		},
 			error: function (data) {
 				console.log(data);
