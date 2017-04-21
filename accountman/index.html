@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+    <meta name="description" content="">
+    <meta name="author" content="">
+   
+    <title>Smart Park - Parking, just Smarter!</title>
+
+    <!-- Custom styles for this template -->
+    <link href="smartpark.css" rel="stylesheet">
+    <script src="authuser.js"></script>
+    <script src="logout.js"></script>
+	<script src="getStatus.js"></script>
+	<script src="checkin.js"></script>
+	<script src="modacct.js"></script>
+</head>
+<body onload="AuthUser()">
+<div class="navbar navbar-default navbar-fixed-top">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header">
+			<span class="sr-only">Toggle Navigation</span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href='/'>Parking Smarter</a>
+		</div><!--Header-->
+		<div class="navbar-collapse collapse" id="header">
+		<ul class="nav navbar-nav">
+			<li><a href= "/">Home</a></li>
+			<li><a href="/about">About</a></li>
+			<li><a href="/viewParkingMap">View Parking Maps</a></li>
+		</ul>
+		<div class="container-fluid">
+		<form class="navbar-form navbar-right">
+		<a class="btn btn-success" onclick="display_warning()" role="button">Log Out</a>
+		</form>
+		</div>
+		</div><!--collapse-->
+	</div><!--container-fluid-->
+</div><!--navfixed top-->
+
+<div class="container-fluid" id= "accountmancontainer" style="padding-top:50px">
+	<div class="row">
+	<div class="col-xs-12 col-sm-12 col-lg-12">
+		<h3 class="page-header"> Hello! Welcome to your Smart Park account!</h3></div>
+	</div>
+	<div class="row">
+		<div class="col-sm-12 col-lg-12">
+			<div class="nav navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#tabsMenu">
+				<span class="sr-only">Toggle Navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				</button>
+			</div>
+		<div class="collapse navbar-collapse" id="tabsMenu">
+			<ul class="nav navbar-nav nav-tabs">
+				<!--li class="active"><a type="button" data-toggle="tab" href="#overview">Overview</a></li-->
+				<li class="active"><a type="button" data-toggle="tab" href="#Useracct">User Account Details</a></li>
+				<li><a type="button" data-toggle="tab" href="#parkinfo">Parking Information</a></li>
+				<li><a type="button" data-toggle="tab" href="#reservations">Reservations</a></li>
+				<li><a type="button" data-toggle="tab" href="#payment">Payment Information</a></li>
+				<li><a type="button" data-toggle="tab" href="#infractionReport">Report Infraction</a></li>
+				<li><a type="button" id="infract" data-toggle="tab" href="#infractions" style="display: none;">Manage Lots</a></li>
+			</ul>
+		</div><!--Nav Collapse-->
+	</div><!--Row-->
+
+<div class="tab-content">
+
+	<div id="overview" class="tab-pane fade" >
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-sm-2"></div>
+				<div class="col-sm-8">
+					<h2>Account Overview</h2>
+					<form class="form-inline" style="padding: 20px;">
+					<div class="form-group-vertical">
+							<label class="control-label">Current Parking Status:</label>
+									<p id="overviewParkStat" class="form-control-static"></p>
+					</div>
+					<div class="form-group-vertical">
+							<label class="control-label">Current Amount Due:</label>
+									<p id="OverviewCurrAMTdue" class="form-control-static"></p>
+					</div>
+					</form>
+				</div>
+				<div class="col-sm-2"></div>
+			</div>
+		</div><!--outer cont-->
+	</div><!--overview tab-->
+
+	
+	<div id="Useracct" class="tab-pane fade in active">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-sm-1"></div>
+				<div class="col-sm-5">
+					<h2>User Details</h2>
+					<form class="form-signin" style="padding: 20px;">
+						<div class="form-group">
+		
+						</div>
+					</form>
+				</div>
+				<div class="col-sm-5">
+					<h2>Modify Details</h2>
+					<form class="form-signin" style="padding: 20px;">
+						<div class="form-group">
+							<label class="control-label">UserName:</label>
+							<p id="email_p" class="form-control"style="max-width: 300px;">Placeholder</p>
+							<label class="control-label" >Password:</label>
+							<input type="password" class="form-control" id="password_p" placeholder="Password"  style="max-width: 300px;"required autofocus>
+							<label class="control-label">Confirm Password:</label>
+							<input type="password" class="form-control" id="password_conf" placeholder="Confirm Password" style="max-width: 300px;" required autofocus>
+							<label class="control-label">First Name:</label>
+							<input type="text" class="form-control" id="f_name" placeholder="First Name"  style="max-width: 300px;" autofocus>
+							<label class="control-label">Last Name:</label>
+							<input type="text" class="form-control" id="l_name" placeholder="Last Name"  style="max-width: 300px;" autofocus>
+							<button type="button" onclick="modAcct()" class="btn btn-success">Submit</button>
+						</div>
+					</form>
+				</div>
+				<div class="col-sm-1"></div>
+			</div><!--row-->
+		</div><!--outer Cont-->
+	</div><!--UserAcct-->
+	
+		<div id="parkinfo" class="tab-pane fade" data-toggle="validator">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-sm-2">
+					</div><!--col3-->
+					<div class="col-sm-8">
+					<h2>User Parking Information</h2>
+						<form class="form-inline" style="padding: 20px;">
+							<div class="form-group-vertical">
+											<p id="disclaimer">*Options Listed are based on your provided location (Geolocation)</p>
+											<select class="form-control" id="lot" onchange="report(this.value)">
+												<option value=-1>Please select a parking lot</option>
+											</select>
+											<select class="form-control" id="spot">
+												<option>Please Select Spot</option>
+											</select>
+											<button class="btn btn-success" onClick="checkin()" data-toggle="tab" href="#parkinfo">Check In</button>
+											<button class="btn btn-default"  onClick="checkout()" data-toggle="tab" href="#parkinfo">Check Out</button>
+							</div>
+							<div class="form-group-vertical">
+								<label class="control-label">Current Parking Status:</label>
+										<p id="currstatus" class="form-control-static"></p>
+							</div>
+							<div class="form-group-vertical">
+								<label class="control-label">Current Parking Lot:</label>
+										<p id="currlot" class="form-control-static">None</p>
+							</div>
+							<div class="form-group-vertical">
+								<label class="control-label">Spot:</label>
+										<p id="currspot" class="form-control-static">None</p>
+							</div>
+						</form>
+					</div><!--col-sm-8-->
+					<div class="col-sm-2">
+					</div><!--col2-->
+				</div><!--row-->
+			</div><!--outer cont.-->
+		</div><!--parkinfo-->
+	<div id="infractionReport" class="tab-pane fade">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-sm-3"></div>
+				<div class="col-sm-6">
+					<h2>Report Infractions</h2>
+					<form class="form-horizontal">
+						<div class="form-group">
+							<p id="infractDis" class="form-control-static">All Parking Lots are Generated using your location</p>
+							<label for="infractLotSelect">Select a Parking Lot:</label>
+							<select class="form-control" id="infractLotSelect">
+								<option>Please Select Parking Lot</option>
+							</select>
+							<label for="comment">Parking Problem Description:</label>
+							<textarea class="form-control" rows="5" id="comment" maxlength="250" required></textarea>
+							<a class="btn btn-default" onclick="submitReport()">Submit</a>
+							<h6 class="form-control-static">*Currently we are unable to accept pictures on this platform</h6>
+						</div>
+					</form>
+				</div><!--10-->
+				<div class="col-sm-3"></div>
+			</div>
+		</div><!--outer Container-->
+	</div><!--infractionsReport-->
+	
+	<div id="reservations" class="tab-pane fade">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-sm-2"></div>
+				<div class="col-sm-8">
+				<h2>Reservations</h2>
+				<p></p>
+				</div>
+				<div class="col-sm-2"></div>
+			</div>
+		</div><!--outer Container-->				
+	</div>
+	
+	<div id="payment" class="tab-pane fade">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-sm-2">
+				</div>
+				<div class="col-sm-8">
+				<h2>Payment Options and Information</h2>
+				<a class="btn btn-success" href="/404">Redirection to payment Site</a>
+				</div>
+				<div class="col-sm-2">
+				</div>
+			</div>
+		</div><!--outer Container-->
+	</div><!--payment tabcontent-->
+	<div id="infractions" class="tab-pane fade">
+		<div class="container-fluid" style="max-height: 100%;">		
+			<div class="row">
+				<div class="col-sm-3">
+					<h2 style="display: inline-block">Lot Access</h2>
+					<p>Access the lot editor for your account</p>
+					<a class="btn btn-default" href="/loteditor" role="button">Lot Editor</a>
+				</div><!--col3-->
+				<div class="col-sm-8">
+						<form class="form-inline">
+						<div class="form-group">
+						<h2 class="form-control-static" id="infract_header" style="text-decoration: underline;"></h2>
+						<select id="adminSelect" class="form-control" onchange="populateTable(this.value)">
+							<option value=null>Please Select Parking Lot</option>					
+						</select>
+						<a class="btn btn-info" onclick="populateTable(document.getElementById('adminSelect').value)">Refresh</a>
+						<p class="form-control-static" id="infractError" style="color:red;"></p>
+						</div>
+						</form>
+					<div class="container-fluid" style="padding-bottom: 60px;">
+							<div class="table-responsive" style="overflow-x: scroll; overflow-y: scroll;">
+							<table class="table" id="infractTable">
+								<thead>
+									<tr>
+										<th>User ID</th>
+										<th>Lot ID</th>
+										<th>Type</th>
+										<th>Event ID</th>
+										<th>Created</th>
+										<th>Description</th>
+										<th>Image</th>
+										<th>Resolve</th>
+									</tr>
+								</thead>
+							</table>
+							</div>
+					</div>
+				</div><!--col8-->
+				<div class="col-sm-1"></div>
+			</div>
+		</div><!--outer container-->
+	</div><!--infractions-->
+		</div><!--Tabcontent end-->
+</div><!--Dashboard container -->
+
+<div id="failureModal" class="modal fade" role="dialog" data-keyboard="false" data-backdrop='static'>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<p>Not Logged into Smart Park!</p>
+				<h3 class="modal-title">Whoops!</h3>			
+			</div>
+			<div class="modal-body">
+				<p>It seems you are not logged in.</p>
+				<p>Please Click either "login" or "create account"
+				to be redirected to where you need to go</p>
+			</div>
+			<div class="modal-footer">
+				<a class="btn btn-success" href="/login" role="button">Login</a>
+				<a class="btn btn-default" href="/CreateAccount">CreateAccount</a>
+				<button type="button" class="btn btn-default" data-dismiss="modal" onClick="window.location.replace('/')">Close</button><!--Relocate to .js-->
+			</div>
+		</div>
+	</div>
+</div><!--Modal div-->
+
+<div id="warnModal" class="modal fade" role="dialog" data-keyboard="false" data-backdrop='static'>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 class="modal-title">Are you sure you want to leave?</h3>			
+			</div>
+			<div class="modal-body">
+			<p>You will be redirected to the login screen</p>
+			</div>
+			<div class="modal-footer">
+				<a class="btn btn-success" href="/login" onclick="crack_token()" role="button">Yes</a>
+				<button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+			</div>
+		</div>
+	</div>
+</div><!--warningModal div-->
+
+<div id="checkModal" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 id="modalTitle" class="modal-title">Parking Status</h3>			
+			</div>
+			<div class="modal-body">
+			<p id="innerModal"></p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div><!--checkinoutModal div-->
+
+<div id="infractModal" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 id="modalTitle" class="modal-title">Infraction Report Status</h3>			
+			</div>
+			<div class="modal-body">
+			<p id="infractText"></p>
+			</div>
+			<div class="modal-footer">
+				<button id="infractClose" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div><!--infractModal div-->
+
+<div id="disImg" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 id="modalTitle" class="modal-title">Infraction Image</h3>			
+			</div>
+			<div class="modal-body">
+				<img id="infractImage" style="max-height: 100%; max-width: 100%;">
+			</div>
+			<div class="modal-footer">
+				<button id="infractClose" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div><!--infractModal div-->
+
+<!--Fixed Footer for all webpages-->
+<div class="navbar navbar-default navbar-fixed-bottom">
+	<div class="containter">
+		<div class="navbar-text pull-left">
+		<p>Parking Smarter 2017.</p>
+		</div>
+	</div>
+</div>
+   <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+</body>
+</html>
