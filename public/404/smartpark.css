@@ -26,7 +26,6 @@ body {
 	bottom: auto;
 	color: red;
 }
-.carousel-inner > .item > img { width:100%; height:640px; }
 .icon-bar
 {
   background:gray !important; /*Whatever colour you want for icon lines*/
